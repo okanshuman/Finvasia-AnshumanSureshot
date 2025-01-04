@@ -11,6 +11,9 @@ from datetime import datetime
 from utils import round_to_two_decimal, is_valid_symbol, clean_symbol
 from order_management import placeOrder, getSymbolNameFinvasia  # Import getSymbolNameFinvasia
 
+# Global set to keep track of ordered symbols
+ordered_symbols = set()
+
 def fetch_stocks(stock_data, holdings, api):
     urls = [
         "https://chartink.com/screener/anshuman-sureshot1",
@@ -76,11 +79,18 @@ def fetch_stocks(stock_data, holdings, api):
                 trading_symbol_name = f"{stock['symbol']}"
                 correct_symbol_name = getSymbolNameFinvasia(api, trading_symbol_name)
                 
-                print(f"Placing order for {correct_symbol_name}: Quantity={quantity}, Price={current_price}")  # Debugging output
-                
-                order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=correct_symbol_name, quantity=quantity)
-                
-                print(f"Order response for {correct_symbol_name}: {order_response}")  # Print each order response
+                # Check if an order has already been placed for this symbol using the global ordered_symbols set
+                if correct_symbol_name not in ordered_symbols:
+                    print(f"Placing order for {correct_symbol_name}: Quantity={quantity}, Price={current_price}")  # Debugging output
+                    
+                    order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=correct_symbol_name, quantity=quantity)
+                    
+                    print(f"Order response for {correct_symbol_name}: {order_response}")  # Print each order response
+                    
+                    # Mark this symbol as ordered
+                    ordered_symbols.add(correct_symbol_name)
+                else:
+                    print(f"Order already placed for {correct_symbol_name}. Skipping.")
 
     except Exception as e:
         logging.error(f"Error fetching stocks: {e}")
