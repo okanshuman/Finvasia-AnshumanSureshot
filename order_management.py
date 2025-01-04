@@ -33,10 +33,6 @@ def placeOrder(api, buy_or_sell, tradingsymbol, quantity,
     )
 
 
-
-
-
-
 # Fetch Current Price
 #symbolName='Reliance'
 #currentPrice = getPriceBySymbolName(api, tradingSymbolName=symbolName)
@@ -45,9 +41,6 @@ def placeOrder(api, buy_or_sell, tradingsymbol, quantity,
 # Place Order
 #orderResponse = placeOrder(api,buy_or_sell='B',tradingsymbol='RELIANCE-EQ',quantity=100)
 #print(orderResponse)
-
-#response = api.get_holdings()
-#print(response)
 
 #response = api.single_order_history('25010300843908')
 #print(response)

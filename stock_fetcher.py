@@ -10,7 +10,7 @@ import logging
 from datetime import datetime
 from utils import round_to_two_decimal, is_valid_symbol, clean_symbol
 
-def fetch_stocks(stock_data):
+def fetch_stocks(stock_data, holdings):
     urls = [
         "https://chartink.com/screener/anshuman-sureshot1",
         "https://chartink.com/screener/anshuman-sureshot2",
@@ -39,24 +39,22 @@ def fetch_stocks(stock_data):
                 columns = row.find_elements(By.TAG_NAME, 'td')
                 if len(columns) > 5:  # Ensure there are enough columns to avoid index errors
                     stock_name = columns[1].text.strip()
-                    stock_symbol = clean_symbol(columns[2].text.strip().replace('$', ''))  
+                    stock_symbol = clean_symbol(columns[2].text.strip().replace('$', '').replace('-EQ', ''))  # Remove -EQ
                     current_price = round_to_two_decimal(float(columns[5].text.strip()))  # Fetch current price
                     identified_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                    # Check if the stock is valid and not already in the list
-                    if is_valid_symbol(stock_symbol):
+                    # Check if the stock is valid and not already in the list and not in holdings
+                    if is_valid_symbol(stock_symbol) and stock_symbol not in holdings:
                         new_stocks.append({"name": stock_name, 
                                            "symbol": stock_symbol, 
                                            "current_price": current_price, 
                                            "date": identified_date})
 
-        # Update global stock_data with newly fetched stocks
-        # Remove stocks that are no longer present in new_stocks
+        # Create a set of existing symbols for quick lookup
         existing_symbols = {stock['symbol'] for stock in stock_data}
-        new_symbols = {stock['symbol'] for stock in new_stocks}
 
-        # Remove stocks that are not in the new data
-        stock_data[:] = [stock for stock in stock_data if stock['symbol'] in new_symbols]
+        # Remove stocks that are no longer present in new_stocks
+        stock_data[:] = [stock for stock in stock_data if stock['symbol'] in {s['symbol'] for s in new_stocks}]
 
         # Add new stocks that are not already in the existing data
         for new_stock in new_stocks:
