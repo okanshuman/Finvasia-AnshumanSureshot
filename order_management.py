@@ -9,8 +9,15 @@ def getPriceBySymbolName(api, tradingSymbolName):
     """Fetch the quote for a given exchange and token."""
     getScriptToken = api.searchscrip(exchange='NSE',searchtext=tradingSymbolName)
     response = api.get_quotes(exchange='NSE', token=getScriptToken['values'][0].get('token'))
-    currentPrice = response.get('lp')
-    return currentPrice
+    currentPriceFromResponse = response.get('lp')
+    return currentPrice 
+
+def getSymbolNameFinvasia(api, tradingSymbolName):
+    """Fetch the quote for a given exchange and token."""
+    getScriptToken = api.searchscrip(exchange='NSE',searchtext=tradingSymbolName)
+    response = api.get_quotes(exchange='NSE', token=getScriptToken['values'][0].get('token'))
+    symbolNameFromResponse = response.get('tsym')
+    return symbolNameFromResponse 
 
 def placeOrder(api, buy_or_sell, tradingsymbol, quantity, 
                 product_type='C', exchange='NSE', discloseqty=0, 

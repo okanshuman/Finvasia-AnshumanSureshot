@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import logging
 from datetime import datetime
 from utils import round_to_two_decimal, is_valid_symbol, clean_symbol
-from order_management import placeOrder  # Import placeOrder here
+from order_management import placeOrder, getSymbolNameFinvasia  # Import getSymbolNameFinvasia
 
 def fetch_stocks(stock_data, holdings, api):
     urls = [
@@ -62,13 +62,25 @@ def fetch_stocks(stock_data, holdings, api):
             if new_stock['symbol'] not in existing_symbols:
                 stock_data.append(new_stock)
 
+        logging.info(f"Total stocks currently in stock_data: {len(stock_data)}")
+        
         # Place orders for all stocks currently in stock_data
         for stock in stock_data:
             current_price = stock['current_price']
+            print(f"Processing stock: {stock['symbol']} with current price: {current_price}")  # Debugging output
+            
             if current_price > 0:  # Ensure price is valid
                 quantity = int(5000 / current_price)  # Calculate quantity as 5000/current_price and round down
-                order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=stock['symbol'] + '-EQ', quantity=quantity)
-                print(order_response)  # Print each order response
+                
+                # Get the correct symbol name before placing the order
+                trading_symbol_name = f"{stock['symbol']}"
+                correct_symbol_name = getSymbolNameFinvasia(api, trading_symbol_name)
+                
+                print(f"Placing order for {correct_symbol_name}: Quantity={quantity}, Price={current_price}")  # Debugging output
+                
+                order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=correct_symbol_name, quantity=quantity)
+                
+                print(f"Order response for {correct_symbol_name}: {order_response}")  # Print each order response
 
     except Exception as e:
         logging.error(f"Error fetching stocks: {e}")
