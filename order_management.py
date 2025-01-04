@@ -12,7 +12,7 @@ def getPriceBySymbolName(api, tradingSymbolName):
     currentPrice = response.get('lp')
     return currentPrice
 
-def place_order(api, buy_or_sell, tradingsymbol, quantity, 
+def placeOrder(api, buy_or_sell, tradingsymbol, quantity, 
                 product_type='C', exchange='NSE', discloseqty=0, 
                 price_type='MKT', price=0.0, trigger_price=None, 
                 retention='DAY', amo='NO', remarks=None):
@@ -33,3 +33,21 @@ def place_order(api, buy_or_sell, tradingsymbol, quantity,
     )
 
 
+
+
+
+
+# Fetch Current Price
+#symbolName='Reliance'
+#currentPrice = getPriceBySymbolName(api, tradingSymbolName=symbolName)
+#print(f"Current Price of {symbolName} : {currentPrice}")
+
+# Place Order
+#orderResponse = placeOrder(api,buy_or_sell='B',tradingsymbol='RELIANCE-EQ',quantity=100)
+#print(orderResponse)
+
+#response = api.get_holdings()
+#print(response)
+
+#response = api.single_order_history('25010300843908')
+#print(response)

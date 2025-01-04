@@ -1,17 +1,34 @@
 # app.py
-from order_management import *
-import credentials as cr
 
-# Initialize API
-api = ShoonyaApiPy()
-api.login(userid=cr.user, password=cr.pwd, twoFA=cr.factor2, vendor_code=cr.vc, api_secret=cr.app_key, imei=cr.imei)
+from flask import Flask, render_template, jsonify
+from flask_apscheduler import APScheduler
+import logging
 
-# Fetch Current Price
-symbolName='Reliance'
-currentPrice = getPriceBySymbolName(api, tradingSymbolName=symbolName)
-print(f"Current Price of {symbolName} : {currentPrice}")
+# Import the fetch_stocks function from stock_fetcher module
+from stock_fetcher import fetch_stocks
 
-# Place Order
-#order_response = place_order(api,buy_or_sell='B',tradingsymbol='RELIANCE-EQ',quantity=100)
-#print(order_response)
+app = Flask(__name__)
 
+# Initialize the scheduler
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
+
+# Global variable to hold stock data
+stock_data = []
+
+# Schedule fetch_stocks to run every 5 minutes (300 seconds) with a unique ID
+scheduler.add_job(func=lambda: fetch_stocks(stock_data), trigger='interval', seconds=300, id='fetch_stocks_job')
+
+@app.route('/')
+def index():
+    fetch_stocks(stock_data)  # Invoke fetch_stocks whenever the homepage is accessed
+    return render_template('index.html', stocks=stock_data)
+
+@app.route('/api/stocks')
+def get_stocks():
+    """API endpoint to get the latest stocks in JSON format."""
+    return jsonify(stock_data)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5004, debug=True)
