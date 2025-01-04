@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import logging
 from datetime import datetime
+import pytz  # Import pytz for timezone handling
 from utils import round_to_two_decimal, is_valid_symbol, clean_symbol
 from order_management import placeOrder, getSymbolNameFinvasia  # Import getSymbolNameFinvasia
 
@@ -67,30 +68,38 @@ def fetch_stocks(stock_data, holdings, api):
 
         logging.info(f"Total stocks currently in stock_data: {len(stock_data)}")
         
-        # Place orders for all stocks currently in stock_data
-        for stock in stock_data:
-            current_price = stock['current_price']
-            print(f"Processing stock: {stock['symbol']} with current price: {current_price}")  # Debugging output
-            
-            if current_price > 0:  # Ensure price is valid
-                quantity = int(5000 / current_price)  # Calculate quantity as 5000/current_price and round down
+        # Get current time in IST using pytz
+        ist_timezone = pytz.timezone('Asia/Kolkata')
+        current_time = datetime.now(ist_timezone)
+
+        # Place orders only at 3:20 PM IST on working days (Monday to Friday)
+        if current_time.weekday() < 5 and current_time.hour == 15 and current_time.minute == 20:
+            # Place orders for all stocks currently in stock_data
+            for stock in stock_data:
+                current_price = stock['current_price']
+                print(f"Processing stock: {stock['symbol']} with current price: {current_price}")  # Debugging output
                 
-                # Get the correct symbol name before placing the order
-                trading_symbol_name = f"{stock['symbol']}"
-                correct_symbol_name = getSymbolNameFinvasia(api, trading_symbol_name)
-                
-                # Check if an order has already been placed for this symbol using the global ordered_symbols set
-                if correct_symbol_name not in ordered_symbols:
-                    print(f"Placing order for {correct_symbol_name}: Quantity={quantity}, Price={current_price}")  # Debugging output
+                if current_price > 0:  # Ensure price is valid
+                    quantity = int(5000 / current_price)  # Calculate quantity as 5000/current_price and round down
                     
-                    order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=correct_symbol_name, quantity=quantity)
+                    # Get the correct symbol name before placing the order
+                    trading_symbol_name = f"{stock['symbol']}"
+                    correct_symbol_name = getSymbolNameFinvasia(api, trading_symbol_name)
                     
-                    print(f"Order response for {correct_symbol_name}: {order_response}")  # Print each order response
-                    
-                    # Mark this symbol as ordered
-                    ordered_symbols.add(correct_symbol_name)
-                else:
-                    print(f"Order already placed for {correct_symbol_name}. Skipping.")
+                    # Check if an order has already been placed for this symbol using the global ordered_symbols set
+                    if correct_symbol_name not in ordered_symbols:
+                        print(f"Placing order for {correct_symbol_name}: Quantity={quantity}, Price={current_price}")  # Debugging output
+                        
+                        order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=correct_symbol_name, quantity=quantity)
+                        
+                        print(f"Order response for {correct_symbol_name}: {order_response}")  # Print each order response
+                        
+                        # Mark this symbol as ordered
+                        ordered_symbols.add(correct_symbol_name)
+                    else:
+                        print(f"Order already placed for {correct_symbol_name}. Skipping.")
+        else:
+            print("Not the right time to place orders. Current time:", current_time.strftime("%Y-%m-%d %H:%M:%S"))
 
     except Exception as e:
         logging.error(f"Error fetching stocks: {e}")
