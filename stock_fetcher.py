@@ -9,8 +9,9 @@ from selenium.webdriver.support import expected_conditions as EC
 import logging
 from datetime import datetime
 from utils import round_to_two_decimal, is_valid_symbol, clean_symbol
+from order_management import placeOrder  # Import placeOrder here
 
-def fetch_stocks(stock_data, holdings):
+def fetch_stocks(stock_data, holdings, api):
     urls = [
         "https://chartink.com/screener/anshuman-sureshot1",
         "https://chartink.com/screener/anshuman-sureshot2",
@@ -60,6 +61,14 @@ def fetch_stocks(stock_data, holdings):
         for new_stock in new_stocks:
             if new_stock['symbol'] not in existing_symbols:
                 stock_data.append(new_stock)
+
+        # Place orders for all stocks currently in stock_data
+        for stock in stock_data:
+            current_price = stock['current_price']
+            if current_price > 0:  # Ensure price is valid
+                quantity = int(5000 / current_price)  # Calculate quantity as 5000/current_price and round down
+                order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=stock['symbol'] + '-EQ', quantity=quantity)
+                print(order_response)  # Print each order response
 
     except Exception as e:
         logging.error(f"Error fetching stocks: {e}")
