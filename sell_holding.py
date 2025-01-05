@@ -1,18 +1,28 @@
 from order_management import *
 
+# Initialize a set to keep track of sold trading symbols
+sold_symbols = set()
+
 def sell_holding(api):
     holdings_response = api.get_holdings()
    
     # Check if holdings_response is None or empty
     if holdings_response is None or not isinstance(holdings_response, list):
-        print("No valid holdings response received.")
+        # print("No valid holdings response received.")
         return
     
     # Extracting the exchange trading symbols and quantities
     for holding in holdings_response:
         if holding['stat'] == 'Ok':
             for tsym_info in holding['exch_tsym']:
-                tradingsymbol = tsym_info['tsym']  # Get the trading symbol
+                if tsym_info['exch'] == 'NSE':  # Check if the exchange is NSE
+                    tradingsymbol = tsym_info['tsym']  # Get the trading symbol for NSE
+    
+                # Skip if this symbol has already been sold
+                if tradingsymbol in sold_symbols:
+                    print(f"{tradingsymbol} has already been sold. Skipping.")
+                    continue
+                
                 quantity_str = holding['npoadqty']  # Get the quantity available for selling
                 averageBuyPrice = float(holding['upldprc'])  # Ensure average buy price is a float
 
@@ -36,6 +46,9 @@ def sell_holding(api):
                     if quantity > 0:
                         order_response = placeOrder(api, buy_or_sell='S', tradingsymbol=tradingsymbol, quantity=quantity)
                         print(f"Placed sell order for {quantity} of {tradingsymbol}: {order_response}")
+                        
+                        # Add the symbol to the sold symbols set
+                        sold_symbols.add(tradingsymbol)
                     else:
                         print(f"No available quantity to sell for {tradingsymbol}.")
                 else:
