@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify
 from flask_apscheduler import APScheduler
 import logging
-from stock_fetcher import fetch_stocks
+from fetch_and_buy_stock import *
 from order_management import *
 import credentials as cr
 from sell_holding import sell_holding  # Import the new function
