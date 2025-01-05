@@ -23,9 +23,10 @@ stock_data = []
 # Get holdings once and store symbols for filtering later (removing -EQ)
 holdings_response = api.get_holdings()
 holdings_symbols = {holding['tsym'].replace('-EQ', '') for holding in holdings_response[0]['exch_tsym']}  # Extracting symbols from holdings
+holdings_symbols = {holding['tsym'].replace('-BE', '') for holding in holdings_response[0]['exch_tsym']}  # Extracting symbols from holdings
 
-# Schedule fetch_stocks to run every 5 minutes (300 seconds) with a unique ID
-scheduler.add_job(func=lambda: fetch_stocks(stock_data, holdings_symbols, api), trigger='interval', seconds=300, id='fetch_stocks_job')
+# Schedule fetch_stocks to run every 1 minutes (60 seconds) with a unique ID
+scheduler.add_job(func=lambda: fetch_stocks(stock_data, holdings_symbols, api), trigger='interval', seconds=60, id='fetch_stocks_job')
 
 @app.route('/')
 def index():

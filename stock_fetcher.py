@@ -38,7 +38,7 @@ def fetch_stocks(stock_data, holdings, api):
             stock_list = driver.find_element(By.CLASS_NAME, 'table-striped')
             rows = stock_list.find_elements(By.TAG_NAME, 'tr')[1:]  
 
-            logging.info(f"Found {len(rows)} rows of stock data from {url}.")
+            print(f"Found {len(rows)} rows of stock data from {url}.")
 
             for row in rows:
                 columns = row.find_elements(By.TAG_NAME, 'td')
@@ -66,14 +66,15 @@ def fetch_stocks(stock_data, holdings, api):
             if new_stock['symbol'] not in existing_symbols:
                 stock_data.append(new_stock)
 
-        logging.info(f"Total stocks currently in stock_data: {len(stock_data)}")
+        print(f"Total stocks currently in stock_data: {len(stock_data)}")
         
         # Get current time in IST using pytz
         ist_timezone = pytz.timezone('Asia/Kolkata')
         current_time = datetime.now(ist_timezone)
 
         # Place orders only at 3:20 PM IST on working days (Monday to Friday)
-        if current_time.weekday() < 5 and current_time.hour == 15 and current_time.minute == 20:
+        if current_time.weekday() < 5 and current_time.hour == 15 and 20 <= current_time.minute <= 29:
+
             # Place orders for all stocks currently in stock_data
             for stock in stock_data:
                 current_price = stock['current_price']
