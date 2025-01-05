@@ -5,12 +5,12 @@ class ShoonyaApiPy(NorenApi):
     def __init__(self):
         NorenApi.__init__(self, host='https://api.shoonya.com/NorenWClientTP/', websocket='wss://api.shoonya.com/NorenWSTP/')
 
-def getPriceBySymbolName(api, tradingSymbolName):
+def getCurrentPriceBySymbolName(api, tradingSymbolName):
     """Fetch the quote for a given exchange and token."""
     getScriptToken = api.searchscrip(exchange='NSE',searchtext=tradingSymbolName)
     response = api.get_quotes(exchange='NSE', token=getScriptToken['values'][0].get('token'))
     currentPriceFromResponse = response.get('lp')
-    return currentPrice 
+    return currentPriceFromResponse 
 
 def getSymbolNameFinvasia(api, tradingSymbolName):
     """Fetch the quote for a given exchange and token."""
@@ -42,7 +42,7 @@ def placeOrder(api, buy_or_sell, tradingsymbol, quantity,
 
 # Fetch Current Price
 #symbolName='Reliance'
-#currentPrice = getPriceBySymbolName(api, tradingSymbolName=symbolName)
+#currentPrice = getCurrentPriceBySymbolName(api, tradingSymbolName=symbolName)
 #print(f"Current Price of {symbolName} : {currentPrice}")
 
 # Place Order

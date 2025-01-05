@@ -38,7 +38,7 @@ def fetch_stocks(stock_data, holdings, api):
             stock_list = driver.find_element(By.CLASS_NAME, 'table-striped')
             rows = stock_list.find_elements(By.TAG_NAME, 'tr')[1:]  
 
-            print(f"Found {len(rows)} rows of stock data from {url}.")
+            #print(f"Found {len(rows)} rows of stock data from {url}.")
 
             for row in rows:
                 columns = row.find_elements(By.TAG_NAME, 'td')
@@ -78,7 +78,7 @@ def fetch_stocks(stock_data, holdings, api):
             # Place orders for all stocks currently in stock_data
             for stock in stock_data:
                 current_price = stock['current_price']
-                print(f"Processing stock: {stock['symbol']} with current price: {current_price}")  # Debugging output
+                #print(f"Processing stock: {stock['symbol']} with current price: {current_price}") 
                 
                 if current_price > 0:  # Ensure price is valid
                     quantity = int(5000 / current_price)  # Calculate quantity as 5000/current_price and round down
@@ -89,7 +89,7 @@ def fetch_stocks(stock_data, holdings, api):
                     
                     # Check if an order has already been placed for this symbol using the global ordered_symbols set
                     if correct_symbol_name not in ordered_symbols:
-                        print(f"Placing order for {correct_symbol_name}: Quantity={quantity}, Price={current_price}")  # Debugging output
+                        print(f"Placing Buy order for {correct_symbol_name}: Quantity={quantity}, Price={current_price}")
                         
                         order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=correct_symbol_name, quantity=quantity)
                         
