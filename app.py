@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify
 from flask_apscheduler import APScheduler
 import logging
-from fetch_and_buy_stock import *
+from fetch_and_buy_stock import fetch_stocks
 from order_management import *
 import credentials as cr
 from sell_holding import sell_holding  # Import the new function
@@ -21,8 +21,13 @@ stock_data = []
 
 # Get holdings once and store symbols for filtering later (removing -EQ and -BE)
 holdings_response = api.get_holdings()
-holdings_symbols = {holding['tsym'].replace('-EQ', '') for holding in holdings_response[0]['exch_tsym']}
-holdings_symbols.update({holding['tsym'].replace('-BE', '') for holding in holdings_response[0]['exch_tsym']})
+
+# Check if holdings_response is valid and not empty
+if holdings_response and isinstance(holdings_response, list) and len(holdings_response) > 0:
+    holdings_symbols = {holding['tsym'].replace('-EQ', '') for holding in holdings_response[0]['exch_tsym']}
+else:
+    logging.warning("No valid holdings found.")
+    holdings_symbols = set()  # Set to empty if no holdings are found
 
 # Schedule fetch_stocks to run every 1 minute (60 seconds)
 scheduler.add_job(func=lambda: fetch_stocks(stock_data, holdings_symbols, api), trigger='interval', seconds=60, id='fetch_stocks_job')

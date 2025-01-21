@@ -19,7 +19,9 @@ def fetch_stocks(stock_data, holdings, api):
     urls = [
         "https://chartink.com/screener/anshuman-sureshot1",
         "https://chartink.com/screener/anshuman-sureshot2",
-        "https://chartink.com/screener/anshuman-sureshot3"
+        "https://chartink.com/screener/anshuman-sureshot3",
+        "https://chartink.com/screener/anshuman-sureshot4",
+        "https://chartink.com/screener/anshuman-sureshot5"
     ]
 
     chrome_options = Options()
@@ -73,7 +75,7 @@ def fetch_stocks(stock_data, holdings, api):
         current_time = datetime.now(ist_timezone)
 
         # Place orders only at 3:20 PM IST on working days (Monday to Friday)
-        if current_time.weekday() < 5 and current_time.hour == 15 and 20 <= current_time.minute <= 29:
+        if current_time.weekday() < 5 and current_time.hour == 20 and 35 <= current_time.minute <= 49:
 
             # Place orders for all stocks currently in stock_data
             for stock in stock_data:
