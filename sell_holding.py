@@ -23,8 +23,11 @@ def sell_holding(api):
                     print(f"{tradingsymbol} has already been sold. Skipping.")
                     continue
                 
-                quantity_str = holding['npoadqty']  # Get the quantity available for selling
-                averageBuyPrice = float(holding['upldprc'])  # Ensure average buy price is a float
+                # Safely get 'npoadqty' from holding, default to 0 if not present
+                quantity_str = holding.get('npoadqty', '0')  # Default to '0' if key is missing
+                
+                # Safely get 'upldprc' (average buy price), default to 0.0 if not present
+                averageBuyPrice = float(holding.get('upldprc', 0.0))  # Ensure average buy price is a float
 
                 currentPrice = getCurrentPriceBySymbolName(api, tradingsymbol)  # Fetch current price
 
