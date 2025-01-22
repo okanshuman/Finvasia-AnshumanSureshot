@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Stock Data</h1>
+    <table border="1" id="stock-table">
+        <tr>
+            <th>Name</th>
+            <th>Symbol</th>
+            <th>Current Price</th>
+            <th>Date Identified</th>
+        </tr>
+        {% for stock in stocks %}
+        <tr>
+            <td>{{ stock.name }}</td>
+            <td>{{ stock.symbol }}</td>
+            <td>{{ stock.current_price }}</td>
+            <td>{{ stock.date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        function fetchStocks() {
+            $.getJSON('/api/stocks', function(data) {
+                $('#stock-table tr:not(:first)').remove(); // Clear existing rows except header
+                data.forEach(function(stock) {
+                    $('#stock-table').append(`<tr>
+                        <td>${stock.name}</td>
+                        <td>${stock.symbol}</td>
+                        <td>${stock.current_price}</td>
+                        <td>${stock.date}</td>
+                    </tr>`);
+                });
+            });
+        }
+
+        // Fetch stocks every 5 minutes (300000 milliseconds)
+        setInterval(fetchStocks, 300000);
+    </script>
+</body>
+</html>
