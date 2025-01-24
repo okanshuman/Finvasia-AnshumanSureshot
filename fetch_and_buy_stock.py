@@ -74,8 +74,8 @@ def fetch_stocks(stock_data, holdings, api):
         ist_timezone = pytz.timezone('Asia/Kolkata')
         current_time = datetime.now(ist_timezone)
 
-        # Place orders only at 3:20 PM IST on working days (Monday to Friday)
-        if current_time.weekday() < 5 and current_time.hour == 20 and 35 <= current_time.minute <= 49:
+        # Place orders only between 3:27 PM to 3:30 PM IST on working days (Monday to Friday)
+        if current_time.weekday() < 5 and current_time.hour == 20 and 0 <= current_time.minute <= 49:
 
             # Place orders for all stocks currently in stock_data
             for stock in stock_data:
