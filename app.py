@@ -31,7 +31,7 @@ else:
     holdings_symbols = set()  # Set to empty if no holdings are found
 
 # Schedule fetch_stocks to run every 1 minute (60 seconds)
-scheduler.add_job(func=lambda: fetch_stocks(stock_data, holdings_symbols), trigger='interval', seconds=60, id='fetch_stocks_job')
+#scheduler.add_job(func=lambda: fetch_stocks(stock_data, holdings_symbols), trigger='interval', seconds=60, id='fetch_stocks_job')
 
 # Schedule sell_holding to run every 15 seconds
 scheduler.add_job(func=lambda: sell_holding(api), trigger='interval', seconds=15, id='sell_holding_job')
