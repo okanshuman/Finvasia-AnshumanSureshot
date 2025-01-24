@@ -3,45 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Data</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Stock Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #buy-selected {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #buy-selected:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #order-results {
+            margin-top: 15px;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Stock Data</h1>
-    <table border="1" id="stock-table">
-        <tr>
-            <th>Name</th>
-            <th>Symbol</th>
-            <th>Current Price</th>
-            <th>Date Identified</th>
-        </tr>
-        {% for stock in stocks %}
-        <tr>
-            <td>{{ stock.name }}</td>
-            <td>{{ stock.symbol }}</td>
-            <td>{{ stock.current_price }}</td>
-            <td>{{ stock.date }}</td>
-        </tr>
-        {% endfor %}
+    <h1>Stock Selection</h1>
+    
+    <table id="stock-table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Name</th>
+                <th>Symbol</th>
+                <th>Current Price</th>
+                <th>Date Identified</th>
+            </tr>
+        </thead>
+        <tbody id="stock-table-body">
+            {% for stock in stocks %}
+            <tr>
+                <td>
+                    <input type="checkbox" 
+                           class="stock-select" 
+                           data-name="{{ stock.name }}"
+                           data-symbol="{{ stock.symbol }}"
+                           data-price="{{ stock.current_price }}">
+                </td>
+                <td>{{ stock.name }}</td>
+                <td>{{ stock.symbol }}</td>
+                <td>{{ stock.current_price }}</td>
+                <td>{{ stock.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
+    <button id="buy-selected" disabled>Buy Selected Stocks</button>
+    <div id="order-results"></div>
+
     <script>
-        function fetchStocks() {
-            $.getJSON('/api/stocks', function(data) {
-                $('#stock-table tr:not(:first)').remove(); // Clear existing rows except header
-                data.forEach(function(stock) {
-                    $('#stock-table').append(`<tr>
-                        <td>${stock.name}</td>
-                        <td>${stock.symbol}</td>
-                        <td>${stock.current_price}</td>
-                        <td>${stock.date}</td>
-                    </tr>`);
+        // Pure JavaScript implementation without jQuery
+        document.addEventListener('DOMContentLoaded', function() {
+            const stockTable = document.getElementById('stock-table-body');
+            const buyButton = document.getElementById('buy-selected');
+            const orderResults = document.getElementById('order-results');
+
+            // Event delegation for checkboxes
+            stockTable.addEventListener('change', function(event) {
+                if (event.target.classList.contains('stock-select')) {
+                    updateBuyButton();
+                }
+            });
+
+            function updateBuyButton() {
+                const selectedCheckboxes = document.querySelectorAll('.stock-select:checked');
+                
+                if (selectedCheckboxes.length > 0) {
+                    buyButton.disabled = false;
+                    buyButton.textContent = `Buy ${selectedCheckboxes.length} Selected Stock${selectedCheckboxes.length !== 1 ? 's' : ''}`;
+                } else {
+                    buyButton.disabled = true;
+                    buyButton.textContent = 'Buy Selected Stocks';
+                }
+            }
+
+            // Buy selected stocks
+            buyButton.addEventListener('click', function() {
+                const selectedStocks = Array.from(
+                    document.querySelectorAll('.stock-select:checked')
+                ).map(checkbox => ({
+                    name: checkbox.getAttribute('data-name'),
+                    symbol: checkbox.getAttribute('data-symbol'),
+                    price: parseFloat(checkbox.getAttribute('data-price'))
+                }));
+
+                fetch('/buy_stocks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(selectedStocks)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        orderResults.innerHTML = `<p style="color: green;">${data.message}</p>`;
+                        
+                        // Uncheck all checkboxes and disable buy button
+                        document.querySelectorAll('.stock-select:checked').forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                        updateBuyButton();
+                    }
+                })
+                .catch(error => {
+                    orderResults.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
                 });
             });
-        }
 
-        // Fetch stocks every 5 minutes (300000 milliseconds)
-        setInterval(fetchStocks, 300000);
+            // Initial button state
+            updateBuyButton();
+
+            // Periodic stock fetching
+            function fetchStocks() {
+                fetch('/api/stocks')
+                    .then(response => response.json())
+                    .then(stocks => {
+                        const tableBody = document.getElementById('stock-table-body');
+                        tableBody.innerHTML = ''; // Clear existing rows
+
+                        stocks.forEach(stock => {
+                            const row = `
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" 
+                                               class="stock-select"
+                                               data-name="${stock.name}"
+                                               data-symbol="${stock.symbol}"
+                                               data-price="${stock.current_price}">
+                                    </td>
+                                    <td>${stock.name}</td>
+                                    <td>${stock.symbol}</td>
+                                    <td>${stock.current_price}</td>
+                                    <td>${stock.date}</td>
+                                </tr>
+                            `;
+                            tableBody.insertAdjacentHTML('beforeend', row);
+                        });
+
+                        // Reset button state after fetching
+                        updateBuyButton();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching stocks:', error);
+                    });
+            }
+
+            // Fetch stocks every 5 minutes
+            setInterval(fetchStocks, 300000);
+        });
     </script>
 </body>
 </html>
