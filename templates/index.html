@@ -11,9 +11,18 @@
             margin: 0 auto;
             padding: 20px;
         }
+        #cash-display {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f4ff;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -45,6 +54,10 @@
 <body>
     <h1>Finvasia Stock Selection For Buying</h1>
     
+    <div id="cash-display">
+        Available Cash: <span id="cash-amount">Loading...</span>
+    </div>
+
     <table id="stock-table">
         <thead>
             <tr>
@@ -78,13 +91,35 @@
     <div id="order-results"></div>
 
     <script>
-        // Pure JavaScript implementation without jQuery
         document.addEventListener('DOMContentLoaded', function() {
             const stockTable = document.getElementById('stock-table-body');
             const buyButton = document.getElementById('buy-selected');
             const orderResults = document.getElementById('order-results');
+            const cashAmount = document.getElementById('cash-amount');
 
-            // Event delegation for checkboxes
+            // Function to update cash display
+            function updateCashDisplay() {
+                fetch('/api/limits')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.cash) {
+                            cashAmount.textContent = `₹${parseFloat(data.cash).toFixed(2)}`;
+                        } else if (data.error) {
+                            cashAmount.textContent = `Error: ${data.error}`;
+                        }
+                    })
+                    .catch(error => {
+                        cashAmount.textContent = 'Error fetching cash balance';
+                        console.error('Error fetching cash:', error);
+                    });
+            }
+
+            // Initial cash display
+            updateCashDisplay();
+            // Update cash every 30 seconds
+            setInterval(updateCashDisplay, 30000);
+
+            // Existing functionality remains below
             stockTable.addEventListener('change', function(event) {
                 if (event.target.classList.contains('stock-select')) {
                     updateBuyButton();
@@ -103,7 +138,6 @@
                 }
             }
 
-            // Buy selected stocks
             buyButton.addEventListener('click', function() {
                 const selectedStocks = Array.from(
                     document.querySelectorAll('.stock-select:checked')
@@ -124,12 +158,12 @@
                 .then(data => {
                     if (data.message) {
                         orderResults.innerHTML = `<p style="color: green;">${data.message}</p>`;
-                        
-                        // Uncheck all checkboxes and disable buy button
                         document.querySelectorAll('.stock-select:checked').forEach(checkbox => {
                             checkbox.checked = false;
                         });
                         updateBuyButton();
+                        // Update cash balance after purchase
+                        updateCashDisplay();
                     }
                 })
                 .catch(error => {
@@ -137,16 +171,14 @@
                 });
             });
 
-            // Initial button state
             updateBuyButton();
 
-            // Periodic stock fetching
             function fetchStocks() {
                 fetch('/api/stocks')
                     .then(response => response.json())
                     .then(stocks => {
                         const tableBody = document.getElementById('stock-table-body');
-                        tableBody.innerHTML = ''; // Clear existing rows
+                        tableBody.innerHTML = '';
 
                         stocks.forEach(stock => {
                             const row = `
@@ -167,7 +199,6 @@
                             tableBody.insertAdjacentHTML('beforeend', row);
                         });
 
-                        // Reset button state after fetching
                         updateBuyButton();
                     })
                     .catch(error => {
@@ -175,7 +206,6 @@
                     });
             }
 
-            // Fetch stocks every 5 minutes
             setInterval(fetchStocks, 300000);
         });
     </script>
