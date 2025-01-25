@@ -244,6 +244,16 @@
                 justify-content: center;
                 padding: 1rem;
             }
+
+            /* Added horizontal scroll fix */
+            .stock-table {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .stock-table table {
+                min-width: 600px;
+            }
         }
 
         .fade-in {
