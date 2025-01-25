@@ -17,6 +17,11 @@ scheduler.start()
 api = ShoonyaApiPy()
 api.login(userid=cr.user, password=cr.pwd, twoFA=cr.factor2, vendor_code=cr.vc, api_secret=cr.app_key, imei=cr.imei)
 
+# Get limits for current available margin
+limit_response = api.get_limits()
+
+print(limit_response['cash'])
+
 # Global variable to hold stock data
 stock_data = []
 
