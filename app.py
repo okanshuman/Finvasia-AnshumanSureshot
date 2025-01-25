@@ -5,7 +5,7 @@ import logging
 from fetch_and_buy_stock import fetch_stocks
 from order_management import *
 import credentials as cr
-from sell_holding import sell_holding  # Import the new function
+from sell_holding import sell_holding
 
 app = Flask(__name__)
 
@@ -15,29 +15,21 @@ scheduler.init_app(app)
 scheduler.start()
 
 api = ShoonyaApiPy()
-api.login(userid=cr.user, password=cr.pwd, twoFA=cr.factor2, vendor_code=cr.vc, api_secret=cr.app_key, imei=cr.imei)
+api.login(userid=cr.user, password=cr.pwd, twoFA=cr.factor2, 
+          vendor_code=cr.vc, api_secret=cr.app_key, imei=cr.imei)
 
-# Global variable to hold stock data
 stock_data = []
+holdings_symbols = set()
 
-# Get holdings once and store symbols for filtering later (removing -EQ and -BE)
-holdings_response = api.get_holdings()
-
-# Check if holdings_response is valid and not empty
-if holdings_response and isinstance(holdings_response, list) and len(holdings_response) > 0:
-    holdings_symbols = {holding['tsym'].replace('-EQ', '') for holding in holdings_response[0]['exch_tsym']}
-else:
-    logging.warning("No valid holdings found.")
-    holdings_symbols = set()  # Set to empty if no holdings are found
-
-# Schedule jobs
-# scheduler.add_job(func=lambda: fetch_stocks(stock_data, holdings_symbols), trigger='interval', seconds=60, id='fetch_stocks_job')
-scheduler.add_job(func=lambda: sell_holding(api), trigger='interval', seconds=15, id='sell_holding_job')
+# Load purchased stocks from persistent storage (you might want to use a database in production)
+purchased_stocks = set()
 
 @app.route('/')
 def index():
     fetch_stocks(stock_data, holdings_symbols)
-    return render_template('index.html', stocks=stock_data)
+    return render_template('index.html', 
+                         stocks=stock_data,
+                         purchased_stocks=purchased_stocks)
 
 @app.route('/api/stocks')
 def get_stocks():
@@ -57,6 +49,7 @@ def buy_stocks():
     try:
         stocks_to_buy = request.json
         results = []
+        new_purchases = set()
 
         for stock in stocks_to_buy:
             trading_symbol_name = stock['symbol']
@@ -64,13 +57,22 @@ def buy_stocks():
             current_price = stock['price']
             quantity = int(5000 / current_price)
 
-            order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=correct_symbol_name, quantity=quantity)
+            order_response = placeOrder(api, buy_or_sell='B', 
+                                      tradingsymbol=correct_symbol_name, 
+                                      quantity=quantity)
             
             results.append({
                 'symbol': stock['symbol'],
                 'quantity': quantity,
                 'order_response': order_response
             })
+            
+            # Add to purchased stocks
+            new_purchases.add(stock['symbol'])
+
+        # Update purchased stocks
+        global purchased_stocks
+        purchased_stocks.update(new_purchases)
 
         return jsonify({
             'message': f'Successfully placed orders for {len(results)} stocks',
