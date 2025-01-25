@@ -5,21 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finvasia Stock Selection</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #6366f1;
             --success-color: #10b981;
             --background-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            --glass-bg: rgba(255, 255, 255, 0.9);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 12px 24px -6px rgba(31, 38, 135, 0.1);
+            --border-radius: 20px;
         }
 
         body {
             background: var(--background-gradient);
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            color: #1e293b;
         }
 
         .container-xl {
@@ -29,99 +31,149 @@
 
         #cash-display {
             background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            border-radius: var(--border-radius);
             padding: 1.5rem 2rem;
             box-shadow: var(--shadow);
             margin: 2rem 0;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: transform 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #cash-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(120deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);
+            pointer-events: none;
         }
 
         #cash-display:hover {
             transform: translateY(-2px);
+            box-shadow: 0 16px 32px -8px rgba(31, 38, 135, 0.15);
         }
 
         .stock-table {
             background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: transform 0.3s ease;
         }
 
         .table thead th {
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
             color: white;
-            font-weight: 500;
-            padding: 1rem 1.5rem;
+            font-weight: 600;
+            padding: 1.25rem 1.5rem;
             border: none;
+            position: relative;
+        }
+
+        .table thead th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .table tbody td {
-            padding: 1rem 1.5rem;
+            padding: 1.25rem 1.5rem;
             vertical-align: middle;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            transition: background-color 0.2s ease;
         }
 
         .table-hover tbody tr:hover {
-            background-color: rgba(99, 102, 241, 0.05);
+            background-color: rgba(99, 102, 241, 0.03);
         }
 
         .form-check-input {
-            width: 1.2em;
-            height: 1.2em;
-            border: 2px solid #cbd5e1;
+            width: 1.3em;
+            height: 1.3em;
+            border: 2px solid #e2e8f0;
+            margin-top: 0;
             transition: all 0.2s ease;
         }
 
         .form-check-input:checked {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            box-shadow: 0 2px 8px -2px var(--primary-color);
         }
 
         #buy-selected {
-            background: var(--success-color);
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
             color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 12px;
+            padding: 1rem 2.5rem;
+            border-radius: 14px;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #buy-selected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
         }
 
         #buy-selected:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.3);
         }
 
         #buy-selected:active {
             transform: translateY(0);
+            box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.2);
         }
 
         .order-result {
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 16px;
             margin-top: 2rem;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .success {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.2);
         }
 
         .error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.2);
         }
 
         .loading-spinner {
@@ -140,18 +192,41 @@
         .stock-badge {
             background: rgba(99, 102, 241, 0.1);
             color: var(--primary-color);
-            padding: 0.25rem 0.75rem;
-            border-radius: 8px;
+            padding: 0.35rem 1rem;
+            border-radius: 10px;
             font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .header-icon {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .price-cell {
+            position: relative;
+            padding-left: 2rem !important;
+        }
+
+        .price-cell::before {
+            content: '₹';
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.9em;
         }
 
         @media (max-width: 768px) {
             .container-xl {
-                padding: 1rem;
+                padding: 1.5rem;
             }
             
             .table td, .table th {
-                padding: 0.75rem;
+                padding: 1rem;
             }
             
             .date-column {
@@ -160,29 +235,66 @@
 
             #cash-display {
                 flex-direction: column;
-                gap: 1rem;
+                gap: 1.25rem;
                 text-align: center;
             }
+
+            #buy-selected {
+                width: 100%;
+                justify-content: center;
+                padding: 1rem;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .stock-row {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .stock-row.disabled {
+            opacity: 0.6;
+            background: rgba(241, 245, 249, 0.4);
+        }
+
+        .balance-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
     <div class="container-xl">
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <i class="fas fa-chart-line fa-2x text-primary"></i>
+        <div class="d-flex align-items-center gap-3 mb-5">
+            <i class="fas fa-chart-line fa-2x header-icon"></i>
             <h1 class="mb-0">Finvasia Stock Selection</h1>
         </div>
         
         <div id="cash-display">
-            <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-wallet fa-lg"></i>
+            <div class="d-flex align-items-center gap-3">
+                <div class="balance-icon">
+                    <i class="fas fa-wallet fa-lg text-primary"></i>
+                </div>
                 <div>
-                    <div class="text-sm text-muted">Available Balance</div>
-                    <div id="cash-amount" class="h3 mb-0 fw-bold">₹–––</div>
+                    <div class="text-sm text-muted mb-1">Available Balance</div>
+                    <div id="cash-amount" class="h2 mb-0 fw-bold">₹–––</div>
                 </div>
             </div>
-            <div class="stock-badge">
-                <i class="fas fa-database me-2"></i>
+            <div class="stock-badge d-flex align-items-center gap-2">
+                <i class="fas fa-satellite-dish"></i>
                 Live Market Data
             </div>
         </div>
@@ -200,7 +312,7 @@
                 </thead>
                 <tbody id="stock-table-body">
                     {% for stock in stocks %}
-                    <tr data-symbol="{{ stock.symbol }}">
+                    <tr class="stock-row {% if stock.symbol in purchased_stocks %}disabled{% endif %}" data-symbol="{{ stock.symbol }}">
                         <td>
                             <input type="checkbox" 
                                    class="form-check-input stock-select"
@@ -211,7 +323,7 @@
                         </td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="fw-medium">{{ stock.name }}</div>
+                                <div class="fw-semibold">{{ stock.name }}</div>
                             </div>
                         </td>
                         <td>
@@ -219,7 +331,7 @@
                                 {{ stock.symbol }}
                             </div>
                         </td>
-                        <td class="fw-bold">₹{{ stock.current_price }}</td>
+                        <td class="fw-bold price-cell">{{ stock.current_price }}</td>
                         <td class="date-column text-muted">{{ stock.date }}</td>
                     </tr>
                     {% endfor %}
@@ -245,7 +357,6 @@
             const cashAmount = document.getElementById('cash-amount');
             let purchasedStocks = new Set(JSON.parse(localStorage.getItem('purchasedStocks') || '[]'));
 
-            // Update cash display with loading state
             function updateCashDisplay() {
                 cashAmount.innerHTML = `<div class="loading-spinner"></div>`;
                 fetch('/api/limits')
@@ -260,17 +371,15 @@
                     });
             }
 
-            // Update stock purchase status
             function updatePurchaseStatus() {
                 document.querySelectorAll('.stock-select').forEach(checkbox => {
                     if (purchasedStocks.has(checkbox.dataset.symbol)) {
                         checkbox.disabled = true;
-                        checkbox.closest('tr').style.opacity = '0.6';
+                        checkbox.closest('tr').classList.add('disabled');
                     }
                 });
             }
 
-            // Update buy button state
             function updateBuyButton() {
                 const selected = document.querySelectorAll('.stock-select:checked:not(:disabled)');
                 buyButton.disabled = selected.length === 0;
@@ -279,14 +388,12 @@
                     '<i class="fas fa-shopping-cart me-2"></i>Buy Selected Stocks';
             }
 
-            // Stock table interactions
             document.getElementById('stock-table-body').addEventListener('change', e => {
                 if (e.target.classList.contains('stock-select')) {
                     updateBuyButton();
                 }
             });
 
-            // Buy stocks handler
             buyButton.addEventListener('click', function() {
                 const originalButtonHTML = buyButton.innerHTML;
                 buyButton.innerHTML = `<div class="loading-spinner"></div> Processing...`;
@@ -311,7 +418,7 @@
                         localStorage.setItem('purchasedStocks', JSON.stringify([...purchasedStocks]));
                         
                         orderResults.innerHTML = `
-                            <div class="order-result success">
+                            <div class="order-result success fade-in">
                                 <i class="fas fa-check-circle me-2"></i>
                                 ${data.message}<br>
                                 <div class="mt-2">
@@ -327,7 +434,7 @@
                         document.querySelectorAll('.stock-select:checked').forEach(checkbox => {
                             checkbox.checked = false;
                             checkbox.disabled = true;
-                            checkbox.closest('tr').style.opacity = '0.6';
+                            checkbox.closest('tr').classList.add('disabled');
                         });
 
                         updateBuyButton();
@@ -336,7 +443,7 @@
                 })
                 .catch(error => {
                     orderResults.innerHTML = `
-                        <div class="order-result error">
+                        <div class="order-result error fade-in">
                             <i class="fas fa-times-circle me-2"></i>
                             Error: ${error.message}
                         </div>
@@ -353,14 +460,13 @@
             updateBuyButton();
             setInterval(updateCashDisplay, 30000);
 
-            // Stock data refresh
             function fetchStocks() {
                 fetch('/api/stocks')
                     .then(response => response.json())
                     .then(stocks => {
                         const tbody = document.getElementById('stock-table-body');
                         tbody.innerHTML = stocks.map(stock => `
-                            <tr data-symbol="${stock.symbol}">
+                            <tr class="stock-row ${purchasedStocks.has(stock.symbol) ? 'disabled' : ''}" data-symbol="${stock.symbol}">
                                 <td>
                                     <input type="checkbox" 
                                            class="form-check-input stock-select"
@@ -371,7 +477,7 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="fw-medium">${stock.name}</div>
+                                        <div class="fw-semibold">${stock.name}</div>
                                     </div>
                                 </td>
                                 <td>
@@ -379,7 +485,7 @@
                                         ${stock.symbol}
                                     </div>
                                 </td>
-                                <td class="fw-bold">₹${stock.current_price}</td>
+                                <td class="fw-bold price-cell">${stock.current_price}</td>
                                 <td class="date-column text-muted">${stock.date}</td>
                             </tr>
                         `).join('');

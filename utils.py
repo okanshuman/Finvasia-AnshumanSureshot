@@ -6,7 +6,7 @@ def round_to_two_decimal(value):
 
 def is_valid_symbol(symbol):
     """Check if the symbol is valid (does not contain BEES, ETF, ALPHA, MAFANG, MOREALTY, MOMOMENTUM, or numerics)."""
-    return not any(sub in symbol for sub in ["BEES", "ETF", "ALPHA", "MAFANG", "MOREALTY", "MOMOMENTUM", "LIC"]) and not any(
+    return not any(sub in symbol for sub in ["BEES", "ETF", "ALPHA", "MAFANG", "MOREALTY", "MOMOMENTUM", "LIC", "GOLD"]) and not any(
         char.isdigit() for char in symbol)
 
 def clean_symbol(symbol):
