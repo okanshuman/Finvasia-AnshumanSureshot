@@ -10,7 +10,7 @@ def sell_holding(api):
     
     # Check if holdings_response is None or empty
     if holdings_response is None or not isinstance(holdings_response, list):
-        print("No valid holdings response received.")
+        #print("No valid holdings response received.")
         return
     
     print(f"Number of holdings found: {len(holdings_response)}")
