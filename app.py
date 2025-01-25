@@ -24,9 +24,11 @@ holdings_symbols = set()
 # Load purchased stocks from persistent storage (you might want to use a database in production)
 purchased_stocks = set()
 
+position_response_app = api.get_positions()
+print(position_response_app)
+
 # Schedule sell_holding to run every 15 seconds
 scheduler.add_job(func=lambda: sell_holding(api), trigger='interval', seconds=15, id='sell_holding_job')
-
 
 @app.route('/')
 def index():
