@@ -197,6 +197,12 @@
             font-size: 0.875rem;
             font-weight: 500;
             border: 1px solid rgba(99, 102, 241, 0.15);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .stock-badge:hover {
+            background: rgba(99, 102, 241, 0.15);
         }
 
         .header-icon {
@@ -245,7 +251,6 @@
                 padding: 1rem;
             }
 
-            /* Added horizontal scroll fix */
             .stock-table {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
@@ -337,9 +342,9 @@
                             </div>
                         </td>
                         <td>
-                            <div class="stock-badge">
+                            <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ stock.symbol }}" target="_blank" class="stock-badge">
                                 {{ stock.symbol }}
-                            </div>
+                            </a>
                         </td>
                         <td class="fw-bold price-cell">{{ stock.current_price }}</td>
                         <td class="date-column text-muted">{{ stock.date }}</td>
@@ -491,9 +496,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="stock-badge">
+                                    <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${stock.symbol}" target="_blank" class="stock-badge">
                                         ${stock.symbol}
-                                    </div>
+                                    </a>
                                 </td>
                                 <td class="fw-bold price-cell">${stock.current_price}</td>
                                 <td class="date-column text-muted">${stock.date}</td>
