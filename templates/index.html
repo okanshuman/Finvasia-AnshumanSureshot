@@ -61,6 +61,43 @@
             box-shadow: 0 16px 32px -8px rgba(31, 38, 135, 0.15);
         }
 
+        .investment-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        #investment-amount {
+            width: 150px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        #investment-amount:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+        #update-amount {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        #update-amount:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.3);
+        }
+
         .stock-table {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
@@ -259,6 +296,15 @@
             .stock-table table {
                 min-width: 600px;
             }
+
+            .investment-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            #investment-amount {
+                width: 100%;
+            }
         }
 
         .fade-in {
@@ -313,6 +359,19 @@
                 <i class="fas fa-satellite-dish"></i>
                 Live Market Data
             </div>
+        </div>
+
+        <div class="investment-controls">
+            <input type="number" 
+                   id="investment-amount" 
+                   min="1000" 
+                   step="500" 
+                   placeholder="Enter amount per stock"
+                   value="5000">
+            <button id="update-amount" class="btn">
+                <i class="fas fa-sync me-2"></i>
+                Update Amount
+            </button>
         </div>
 
         <div class="stock-table">
@@ -373,6 +432,26 @@
             const cashAmount = document.getElementById('cash-amount');
             let purchasedStocks = new Set(JSON.parse(localStorage.getItem('purchasedStocks') || '[]'));
 
+            // Load stored amount
+            const storedAmount = localStorage.getItem('investmentAmount');
+            if (storedAmount) {
+                document.getElementById('investment-amount').value = storedAmount;
+            }
+
+            // Update amount handler
+            document.getElementById('update-amount').addEventListener('click', function() {
+                const amountInput = document.getElementById('investment-amount');
+                const amount = parseInt(amountInput.value);
+                
+                if (isNaN(amount) || amount < 1000) {
+                    showToast('Minimum amount is ₹1000', 'error');
+                    return;
+                }
+
+                localStorage.setItem('investmentAmount', amount);
+                showToast('Amount updated successfully!', 'success');
+            });
+
             function updateCashDisplay() {
                 cashAmount.innerHTML = `<div class="loading-spinner"></div>`;
                 fetch('/api/limits')
@@ -412,6 +491,7 @@
 
             buyButton.addEventListener('click', function() {
                 const originalButtonHTML = buyButton.innerHTML;
+                const amount = parseInt(document.getElementById('investment-amount').value) || 5000;
                 buyButton.innerHTML = `<div class="loading-spinner"></div> Processing...`;
                 
                 const selectedStocks = Array.from(
@@ -425,7 +505,10 @@
                 fetch('/buy_stocks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(selectedStocks)
+                    body: JSON.stringify({
+                        stocks: selectedStocks,
+                        amount: amount
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -469,6 +552,17 @@
                     buyButton.innerHTML = originalButtonHTML;
                 });
             });
+
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `order-result ${type} fade-in`;
+                toast.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check' : 'times'}-circle me-2"></i>
+                    ${message}
+                `;
+                orderResults.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
 
             // Initial setup
             updateCashDisplay();

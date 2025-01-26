@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template, jsonify, request
 from flask_apscheduler import APScheduler
 import logging
@@ -21,8 +20,6 @@ api.login(userid=cr.user, password=cr.pwd, twoFA=cr.factor2,
 
 stock_data = []
 holdings_symbols = set()
-
-# Load purchased stocks from persistent storage (you might want to use a database in production)
 purchased_stocks = set()
 
 position_response_app = api.get_positions()
@@ -31,14 +28,12 @@ print(position_response_app)
 def should_run_sell_holding():
     """Check if current time is within market hours."""
     now = datetime.now()
-    # Market is open on weekdays and between 9:15 AM and 3:30 PM IST
     if now.weekday() < 5:  # Monday to Friday
-        market_open_time = time(9, 15)  # 9:15 AM
-        market_close_time = time(15, 30)  # 3:30 PM
+        market_open_time = time(9, 15)
+        market_close_time = time(15, 30)
         return market_open_time <= now.time() <= market_close_time
     return False
 
-# Schedule sell_holding to run every 15 seconds
 @scheduler.task('interval', id='sell_holding_job', seconds=15)
 def scheduled_sell_holding():
     if should_run_sell_holding():
@@ -69,7 +64,13 @@ def get_limits():
 @app.route('/buy_stocks', methods=['POST'])
 def buy_stocks():
     try:
-        stocks_to_buy = request.json
+        data = request.json
+        stocks_to_buy = data.get('stocks', [])
+        amount = data.get('amount', 5000)
+        
+        if not isinstance(amount, (int, float)) or amount < 1000:
+            return jsonify({'error': 'Invalid investment amount (minimum ₹1000)'}), 400
+
         results = []
         new_purchases = set()
 
@@ -77,7 +78,10 @@ def buy_stocks():
             trading_symbol_name = stock['symbol']
             correct_symbol_name = getSymbolNameFinvasia(api, trading_symbol_name)
             current_price = stock['price']
-            quantity = int(5000 / current_price)
+            quantity = int(amount / current_price)
+
+            if quantity < 1:
+                continue  # Skip stocks where quantity would be zero
 
             order_response = placeOrder(api, buy_or_sell='B', 
                                       tradingsymbol=correct_symbol_name, 
@@ -89,7 +93,6 @@ def buy_stocks():
                 'order_response': order_response
             })
             
-            # Add to purchased stocks
             new_purchases.add(stock['symbol'])
 
         # Update purchased stocks
