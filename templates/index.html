@@ -29,6 +29,47 @@
             max-width: 1400px;
         }
 
+        /* Notifications Container */
+        .notifications-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 400px;
+        }
+
+        .order-result {
+            position: relative;
+            padding: 1.5rem;
+            padding-right: 2.5rem;
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            animation: slideIn 0.4s ease;
+            margin: 0;
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0.25rem;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
         #cash-display {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
@@ -188,21 +229,6 @@
             box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.2);
         }
 
-        .order-result {
-            padding: 1.5rem;
-            border-radius: 16px;
-            margin-top: 2rem;
-            backdrop-filter: blur(12px);
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            animation: slideIn 0.4s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .success {
             background: rgba(16, 185, 129, 0.12);
             border-color: rgba(16, 185, 129, 0.2);
@@ -305,6 +331,17 @@
             #investment-amount {
                 width: 100%;
             }
+
+            .notifications-container {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .fade-in {
@@ -338,6 +375,8 @@
     </style>
 </head>
 <body>
+    <div id="notifications-container"></div>
+    
     <div class="container-xl">
         <div class="d-flex align-items-center justify-content-center gap-3 mb-5">
             <img src="https://pimwp.s3-accelerate.amazonaws.com/2023/05/shoonya_by_finvasia-Logo.png" 
@@ -420,15 +459,12 @@
                 Buy Selected Stocks
             </button>
         </div>
-
-        <div id="order-results"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const buyButton = document.getElementById('buy-selected');
-            const orderResults = document.getElementById('order-results');
             const cashAmount = document.getElementById('cash-amount');
             let purchasedStocks = new Set(JSON.parse(localStorage.getItem('purchasedStocks') || '[]'));
 
@@ -516,19 +552,18 @@
                         selectedStocks.forEach(stock => purchasedStocks.add(stock.symbol));
                         localStorage.setItem('purchasedStocks', JSON.stringify([...purchasedStocks]));
                         
-                        orderResults.innerHTML = `
-                            <div class="order-result success fade-in">
-                                <i class="fas fa-check-circle me-2"></i>
-                                ${data.message}<br>
-                                <div class="mt-2">
-                                    ${selectedStocks.map(stock => `
-                                        <span class="stock-badge me-2">
-                                            ${stock.symbol} (₹${stock.price.toFixed(2)})
-                                        </span>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
+                        const notification = createNotification(
+                            'success',
+                            `<i class="fas fa-check-circle me-2"></i>
+                            ${data.message}<br>
+                            <div class="mt-2">
+                                ${selectedStocks.map(stock => `
+                                    <span class="stock-badge me-2">
+                                        ${stock.symbol} (₹${stock.price.toFixed(2)})
+                                    </span>
+                                `).join('')}
+                            </div>`
+                        );
 
                         document.querySelectorAll('.stock-select:checked').forEach(checkbox => {
                             checkbox.checked = false;
@@ -541,27 +576,36 @@
                     }
                 })
                 .catch(error => {
-                    orderResults.innerHTML = `
-                        <div class="order-result error fade-in">
-                            <i class="fas fa-times-circle me-2"></i>
-                            Error: ${error.message}
-                        </div>
-                    `;
+                    createNotification(
+                        'error',
+                        `<i class="fas fa-times-circle me-2"></i>
+                        Error: ${error.message}`
+                    );
                 })
                 .finally(() => {
                     buyButton.innerHTML = originalButtonHTML;
                 });
             });
 
-            function showToast(message, type = 'success') {
-                const toast = document.createElement('div');
-                toast.className = `order-result ${type} fade-in`;
-                toast.innerHTML = `
-                    <i class="fas fa-${type === 'success' ? 'check' : 'times'}-circle me-2"></i>
-                    ${message}
+            function createNotification(type, content) {
+                const notification = document.createElement('div');
+                notification.className = `order-result ${type} fade-in`;
+                notification.innerHTML = `
+                    <button class="notification-close">&times;</button>
+                    ${content}
                 `;
-                orderResults.appendChild(toast);
-                setTimeout(() => toast.remove(), 3000);
+                notification.querySelector('.notification-close').addEventListener('click', () => notification.remove());
+                document.getElementById('notifications-container').appendChild(notification);
+                setTimeout(() => notification.remove(), 5000);
+                return notification;
+            }
+
+            function showToast(message, type = 'success') {
+                const notification = createNotification(
+                    type,
+                    `<i class="fas fa-${type === 'success' ? 'check' : 'times'}-circle me-2"></i>
+                    ${message}`
+                );
             }
 
             // Initial setup
