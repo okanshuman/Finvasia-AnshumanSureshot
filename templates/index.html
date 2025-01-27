@@ -640,6 +640,7 @@ tfoot tr {
 
                         updateBuyButton();
                         updateCashDisplay();
+                        updateHoldingsDisplay();
                     }
                 })
                 .catch(error => {
@@ -679,7 +680,10 @@ tfoot tr {
             updateCashDisplay();
             updatePurchaseStatus();
             updateBuyButton();
-            setInterval(updateCashDisplay, 30000);
+            updateHoldingsDisplay();
+
+            setInterval(updateCashDisplay, 15000);
+            setInterval(updateHoldingsDisplay, 15000); 
 
             function fetchStocks() {
                 fetch('/api/stocks')
@@ -716,6 +720,44 @@ tfoot tr {
                     })
                     .catch(console.error);
             }
+
+            function updateHoldingsDisplay() {
+    fetch('/api/holdings')
+        .then(response => response.json())
+        .then(data => {
+
+            // Fix for holdings rows
+            tbody.innerHTML = data.holdings.map(holding => `
+                <tr class="stock-row">
+                    <td>
+                        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.tsym.split('-')[0]}" 
+                           target="_blank" 
+                           class="stock-badge">
+                            ${holding.tsym.split('-')[0]}
+                        </a>
+                    </td>
+                    <td class="fw-bold">${holding.quantity}</td>
+                    <td class="fw-bold price-cell">${holding.avg_price.toFixed(2)}</td>
+                    <td class="fw-bold price-cell">${holding.invested.toFixed(2)}</td>
+                    <td class="fw-bold ${holding.unrealized >= 0 ? 'text-success' : 'text-danger'}">
+                        ${holding.unrealized.toFixed(2)} 
+                    </td>
+                </tr>
+            `).join('');
+
+            const footer = document.querySelector('.holdings-table tfoot tr');
+            footer.innerHTML = `
+                <td class="fw-bold">Totals</td>
+                <td class="fw-bold">${data.holdings.reduce((sum, h) => sum + h.quantity, 0)}</td>
+                <td></td>
+                <td class="fw-bold price-cell">${data.total_invested.toFixed(2)}</td>
+                <td class="fw-bold ${data.total_unrealized >= 0 ? 'text-success' : 'text-danger'}">
+                    ${data.total_unrealized.toFixed(2)}  
+                </td>
+            `;
+        })
+        .catch(error => console.error('Error fetching holdings:', error));
+}
 
             setInterval(fetchStocks, 300000);
         });

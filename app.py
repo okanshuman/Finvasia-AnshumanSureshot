@@ -54,6 +54,19 @@ def index():
                          total_invested=total_invested,
                          total_unrealized=total_unrealized)
 
+@app.route('/api/holdings')
+def get_holdings():
+    try:
+        holdings, total_invested, total_unrealized = process_positions()
+        return jsonify({
+            'holdings': holdings,
+            'total_invested': total_invested,
+            'total_unrealized': total_unrealized
+        })
+    except Exception as e:
+        logging.error(f"Error fetching holdings: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/stocks')
 def get_stocks():
     return jsonify(stock_data)
