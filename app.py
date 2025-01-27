@@ -22,31 +22,37 @@ stock_data = []
 holdings_symbols = set()
 purchased_stocks = set()
 
-position_response_app = api.get_positions()
-print(position_response_app)
-
-def should_run_sell_holding():
-    """Check if current time is within market hours."""
-    now = datetime.now()
-    if now.weekday() < 5:  # Monday to Friday
-        market_open_time = time(9, 15)
-        market_close_time = time(15, 30)
-        return market_open_time <= now.time() <= market_close_time
-    return False
-
-@scheduler.task('interval', id='sell_holding_job', seconds=15)
-def scheduled_sell_holding():
-    if should_run_sell_holding():
-        sell_holding(api)
-    else:
-        print("Market is closed. sell_holding will not run.")
+def process_positions():
+    position_response_app = api.get_positions()
+    holdings = []
+    total_invested = 0.0
+    total_unrealized = 0.0
+    
+    for position in position_response_app:
+        if position.get('stat') == 'Ok' and position.get('prd') == 'C':
+            holding_data = {
+                'tsym': position['tsym'],
+                'avg_price': float(position['daybuyavgprc']),
+                'quantity': int(position['netqty']),
+                'invested': float(position['daybuyamt']),
+                'unrealized': float(position['urmtom'])
+            }
+            holdings.append(holding_data)
+            total_invested += holding_data['invested']
+            total_unrealized += holding_data['unrealized']
+    
+    return holdings, total_invested, total_unrealized
 
 @app.route('/')
 def index():
     fetch_stocks(stock_data, holdings_symbols)
+    holdings, total_invested, total_unrealized = process_positions()
     return render_template('index.html', 
                          stocks=stock_data,
-                         purchased_stocks=purchased_stocks)
+                         purchased_stocks=purchased_stocks,
+                         holdings=holdings,
+                         total_invested=total_invested,
+                         total_unrealized=total_unrealized)
 
 @app.route('/api/stocks')
 def get_stocks():
@@ -57,7 +63,7 @@ def get_limits():
     try:
         # Fetch the response from the API
         limit_response = api.get_limits()
-        print(limit_response)
+        #print(limit_response)
         
         # Calculate available balance
         cash = float(limit_response.get('cash', 0.0))

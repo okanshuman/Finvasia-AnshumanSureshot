@@ -372,6 +372,27 @@
             align-items: center;
             justify-content: center;
         }
+
+        .holdings-table {
+    margin-bottom: 2rem;
+}
+
+tfoot tr {
+    background: rgba(99, 102, 241, 0.05);
+    border-top: 2px solid rgba(99, 102, 241, 0.1);
+}
+
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.bg-light {
+    background-color: rgba(241, 245, 249, 0.4) !important;
+}
     </style>
 </head>
 <body>
@@ -397,6 +418,52 @@
             <div class="stock-badge d-flex align-items-center gap-2">
                 <i class="fas fa-satellite-dish"></i>
                 Live Market Data
+            </div>
+        </div>
+
+        <div class="holdings-table mb-5">
+            <div class="stock-table">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Quantity</th>
+                            <th>Avg. Price</th>
+                            <th>Invested</th>
+                            <th>Unrealized P/L</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for holding in holdings %}
+                        <tr class="stock-row">
+                            <td>
+                                <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ holding.tsym.split('-')[0] }}" 
+                                   target="_blank" 
+                                   class="stock-badge">
+                                    {{ holding.tsym.split('-')[0] }}
+                                </a>
+                            </td>
+                            <td class="fw-bold">{{ holding.quantity }}</td>
+                            <td class="fw-bold price-cell">{{ "%.2f"|format(holding.avg_price) }}</td>
+                            <td class="fw-bold price-cell">{{ "%.2f"|format(holding.invested) }}</td>
+                            <td class="fw-bold {% if holding.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                ₹{{ "%.2f"|format(holding.unrealized) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-light">
+                            <td class="fw-bold">Totals</td>
+                            <td class="fw-bold">{{ holdings|sum(attribute='quantity') }}</td>
+                            <td></td>
+                            <td class="fw-bold price-cell">{{ "%.2f"|format(total_invested) }}</td>
+                            <td class="fw-bold {% if total_unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                ₹{{ "%.2f"|format(total_unrealized) }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
 
