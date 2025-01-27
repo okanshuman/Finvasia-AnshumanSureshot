@@ -55,8 +55,19 @@ def get_stocks():
 @app.route('/api/limits')
 def get_limits():
     try:
+        # Fetch the response from the API
         limit_response = api.get_limits()
-        return jsonify({'cash': limit_response['cash']})
+        print(limit_response)
+        
+        # Calculate available balance
+        cash = float(limit_response.get('cash', 0.0))
+        marginused = float(limit_response.get('marginused', 0.0))
+        brkcollamt = float(limit_response.get('brkcollamt', 0.0))
+        
+        available_balance = cash - marginused + brkcollamt
+        
+        # Return the available balance as "cash"
+        return jsonify({'cash': available_balance})
     except Exception as e:
         logging.error(f"Error fetching limits: {e}")
         return jsonify({'error': str(e)}), 500
