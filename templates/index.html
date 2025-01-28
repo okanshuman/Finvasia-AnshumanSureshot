@@ -393,7 +393,10 @@ tfoot tr {
 .bg-light {
     background-color: rgba(241, 245, 249, 0.4) !important;
 }
+.tr-buy { background-color: rgba(16, 218, 151, 0.1) !important; }
+.tr-sell { background-color: rgba(237, 46, 46, 0.1) !important; }
     </style>
+
 </head>
 <body>
     <div id="notifications-container"></div>
@@ -435,22 +438,24 @@ tfoot tr {
                     </thead>
                     <tbody>
                         {% for holding in holdings %}
-                        <tr class="stock-row">
-                            <td>
-                                <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ holding.tsym.split('-')[0] }}" 
-                                   target="_blank" 
-                                   class="stock-badge">
-                                    {{ holding.tsym.split('-')[0] }}
-                                </a>
-                            </td>
-                            <td class="fw-bold">{{ holding.quantity }}</td>
-                            <td class="fw-bold price-cell">{{ "%.2f"|format(holding.avg_price) }}</td>
-                            <td class="fw-bold price-cell">{{ "%.2f"|format(holding.invested) }}</td>
-                            <td class="fw-bold {% if holding.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                ₹{{ "%.2f"|format(holding.unrealized) }}
-                            </td>
-                        </tr>
-                        {% endfor %}
+                        <tr class="stock-row 
+                            {% if holding.daybuyqty|int > 0 %}tr-buy
+                            {% elif holding.daysellqty|int > 0 %}tr-sell
+                            {% endif %}">
+        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ holding.tsym.split('-')[0] }}" 
+           target="_blank" 
+           class="stock-badge">
+            {{ holding.tsym.split('-')[0] }}
+        </a>
+    </td>
+    <td class="fw-bold">{{ holding.quantity }}</td>
+    <td class="fw-bold price-cell">{{ "%.2f"|format(holding.avg_price) }}</td>
+    <td class="fw-bold price-cell">{{ "%.2f"|format(holding.invested) }}</td>
+    <td class="fw-bold {% if holding.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
+        ₹{{ "%.2f"|format(holding.unrealized) }}
+    </td>
+</tr>
+{% endfor %}
                     </tbody>
                     <tfoot>
                         <tr class="bg-light">
@@ -722,13 +727,12 @@ tfoot tr {
             }
 
             function updateHoldingsDisplay() {
-    fetch('/api/holdings')
-        .then(response => response.json())
-        .then(data => {
-
-            // Fix for holdings rows
+                fetch('/api/holdings')
+                    .then(response => response.json())
+                    .then(data => {
+            const tbody = document.querySelector('.holdings-table tbody');
             tbody.innerHTML = data.holdings.map(holding => `
-                <tr class="stock-row">
+                <tr class="stock-row ${holding.daybuyqty > 0 ? 'tr-buy' : (holding.daysellqty > 0 ? 'tr-sell' : '')}">
                     <td>
                         <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.tsym.split('-')[0]}" 
                            target="_blank" 
@@ -740,27 +744,29 @@ tfoot tr {
                     <td class="fw-bold price-cell">${holding.avg_price.toFixed(2)}</td>
                     <td class="fw-bold price-cell">${holding.invested.toFixed(2)}</td>
                     <td class="fw-bold ${holding.unrealized >= 0 ? 'text-success' : 'text-danger'}">
-                        ${holding.unrealized.toFixed(2)} 
+                        ₹${holding.unrealized.toFixed(2)}
                     </td>
                 </tr>
             `).join('');
 
-            const footer = document.querySelector('.holdings-table tfoot tr');
-            footer.innerHTML = `
-                <td class="fw-bold">Totals</td>
-                <td class="fw-bold">${data.holdings.reduce((sum, h) => sum + h.quantity, 0)}</td>
-                <td></td>
-                <td class="fw-bold price-cell">${data.total_invested.toFixed(2)}</td>
-                <td class="fw-bold ${data.total_unrealized >= 0 ? 'text-success' : 'text-danger'}">
-                    ${data.total_unrealized.toFixed(2)}  
-                </td>
-            `;
-        })
-        .catch(error => console.error('Error fetching holdings:', error));
-}
+                // Update footer
+                const footer = document.querySelector('.holdings-table tfoot tr');
+                footer.innerHTML = `
+                    <td class="fw-bold">Totals</td>
+                    <td class="fw-bold">${data.holdings.reduce((sum, h) => sum + h.quantity, 0)}</td>
+                    <td></td>
+                    <td class="fw-bold price-cell">${data.total_invested.toFixed(2)}</td>
+                    <td class="fw-bold ${data.total_unrealized >= 0 ? 'text-success' : 'text-danger'}">
+                        ₹${data.total_unrealized.toFixed(2)}
+                    </td>
+                `;
+            })
+            .catch(error => console.error('Error fetching holdings:', error));
+    }
 
             setInterval(fetchStocks, 300000);
         });
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"908e745b0fe2e183","version":"2025.1.0","r":1,"token":"79c53ece347a4075a77208d2660a9019","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}' crossorigin="anonymous"></script>
 </body>
 </html>

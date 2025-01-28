@@ -28,6 +28,10 @@ def process_positions():
     total_invested = 0.0
     total_unrealized = 0.0
     
+    # Check if the API response is None or not iterable
+    if position_response_app is None:
+        return holdings, total_invested, total_unrealized
+    
     for position in position_response_app:
         if position.get('stat') == 'Ok' and position.get('prd') == 'C':
             holding_data = {
@@ -35,7 +39,9 @@ def process_positions():
                 'avg_price': float(position['daybuyavgprc']),
                 'quantity': int(position['netqty']),
                 'invested': float(position['daybuyamt']),
-                'unrealized': float(position['urmtom'])
+                'unrealized': float(position['urmtom']),
+                'daybuyqty': int(position['daybuyqty']),  
+                'daysellqty': int(position['daysellqty'])
             }
             holdings.append(holding_data)
             total_invested += holding_data['invested']
