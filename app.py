@@ -19,22 +19,22 @@ api.login(userid=cr.user, password=cr.pwd, twoFA=cr.factor2,
           vendor_code=cr.vc, api_secret=cr.app_key, imei=cr.imei)
 
 stock_data = []
-holdings_symbols = set()
+positions_symbols = set()
 purchased_stocks = set()
 
 def process_positions():
     position_response_app = api.get_positions()
-    holdings = []
+    positions = []
     total_invested = 0.0
     total_unrealized = 0.0
     
     # Check if the API response is None or not iterable
     if position_response_app is None:
-        return holdings, total_invested, total_unrealized
+        return positions, total_invested, total_unrealized
     
     for position in position_response_app:
         if position.get('stat') == 'Ok' and position.get('prd') == 'C':
-            holding_data = {
+            position_data = {
                 'tsym': position['tsym'],
                 'avg_price': float(position['daybuyavgprc']),
                 'quantity': int(position['netqty']),
@@ -43,34 +43,34 @@ def process_positions():
                 'daybuyqty': int(position['daybuyqty']),  
                 'daysellqty': int(position['daysellqty'])
             }
-            holdings.append(holding_data)
-            total_invested += holding_data['invested']
-            total_unrealized += holding_data['unrealized']
+            positions.append(position_data)
+            total_invested += position_data['invested']
+            total_unrealized += position_data['unrealized']
     
-    return holdings, total_invested, total_unrealized
+    return positions, total_invested, total_unrealized
 
 @app.route('/')
 def index():
-    fetch_stocks(stock_data, holdings_symbols)
-    holdings, total_invested, total_unrealized = process_positions()
+    fetch_stocks(stock_data, positions_symbols)
+    positions, total_invested, total_unrealized = process_positions()
     return render_template('index.html', 
                          stocks=stock_data,
                          purchased_stocks=purchased_stocks,
-                         holdings=holdings,
+                         positions=positions,
                          total_invested=total_invested,
                          total_unrealized=total_unrealized)
 
-@app.route('/api/holdings')
-def get_holdings():
+@app.route('/api/positions')
+def get_positions():
     try:
-        holdings, total_invested, total_unrealized = process_positions()
+        positions, total_invested, total_unrealized = process_positions()
         return jsonify({
-            'holdings': holdings,
+            'positions': positions,
             'total_invested': total_invested,
             'total_unrealized': total_unrealized
         })
     except Exception as e:
-        logging.error(f"Error fetching holdings: {e}")
+        logging.error(f"Error fetching positions: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/stocks')

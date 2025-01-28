@@ -373,7 +373,7 @@
             justify-content: center;
         }
 
-        .holdings-table {
+        .positions-table {
     margin-bottom: 2rem;
 }
 
@@ -424,7 +424,7 @@ tfoot tr {
             </div>
         </div>
 
-        <div class="holdings-table mb-5">
+        <div class="positions-table mb-5">
             <div class="stock-table">
                 <table class="table table-hover align-middle">
                     <thead>
@@ -437,22 +437,22 @@ tfoot tr {
                         </tr>
                     </thead>
                     <tbody>
-                        {% for holding in holdings %}
+                        {% for position in positions %}
                         <tr class="stock-row 
-                            {% if holding.daybuyqty|int > 0 %}tr-buy
-                            {% elif holding.daysellqty|int > 0 %}tr-sell
+                            {% if position.daybuyqty|int > 0 %}tr-buy
+                            {% elif position.daysellqty|int > 0 %}tr-sell
                             {% endif %}">
-        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ holding.tsym.split('-')[0] }}" 
+        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ position.tsym.split('-')[0] }}" 
            target="_blank" 
            class="stock-badge">
-            {{ holding.tsym.split('-')[0] }}
+            {{ position.tsym.split('-')[0] }}
         </a>
     </td>
-    <td class="fw-bold">{{ holding.quantity }}</td>
-    <td class="fw-bold price-cell">{{ "%.2f"|format(holding.avg_price) }}</td>
-    <td class="fw-bold price-cell">{{ "%.2f"|format(holding.invested) }}</td>
-    <td class="fw-bold {% if holding.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
-        ₹{{ "%.2f"|format(holding.unrealized) }}
+    <td class="fw-bold">{{ position.quantity }}</td>
+    <td class="fw-bold price-cell">{{ "%.2f"|format(position.avg_price) }}</td>
+    <td class="fw-bold price-cell">{{ "%.2f"|format(position.invested) }}</td>
+    <td class="fw-bold {% if position.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
+        ₹{{ "%.2f"|format(position.unrealized) }}
     </td>
 </tr>
 {% endfor %}
@@ -460,7 +460,7 @@ tfoot tr {
                     <tfoot>
                         <tr class="bg-light">
                             <td class="fw-bold">Totals</td>
-                            <td class="fw-bold">{{ holdings|sum(attribute='quantity') }}</td>
+                            <td class="fw-bold">{{ positions|sum(attribute='quantity') }}</td>
                             <td></td>
                             <td class="fw-bold price-cell">{{ "%.2f"|format(total_invested) }}</td>
                             <td class="fw-bold {% if total_unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
@@ -645,7 +645,7 @@ tfoot tr {
 
                         updateBuyButton();
                         updateCashDisplay();
-                        updateHoldingsDisplay();
+                        updatepositionsDisplay();
                     }
                 })
                 .catch(error => {
@@ -685,10 +685,10 @@ tfoot tr {
             updateCashDisplay();
             updatePurchaseStatus();
             updateBuyButton();
-            updateHoldingsDisplay();
+            updatepositionsDisplay();
 
             setInterval(updateCashDisplay, 15000);
-            setInterval(updateHoldingsDisplay, 15000); 
+            setInterval(updatepositionsDisplay, 15000); 
 
             function fetchStocks() {
                 fetch('/api/stocks')
@@ -726,34 +726,34 @@ tfoot tr {
                     .catch(console.error);
             }
 
-            function updateHoldingsDisplay() {
-                fetch('/api/holdings')
+            function updatepositionsDisplay() {
+                fetch('/api/positions')
                     .then(response => response.json())
                     .then(data => {
-            const tbody = document.querySelector('.holdings-table tbody');
-            tbody.innerHTML = data.holdings.map(holding => `
-                <tr class="stock-row ${holding.daybuyqty > 0 ? 'tr-buy' : (holding.daysellqty > 0 ? 'tr-sell' : '')}">
+            const tbody = document.querySelector('.positions-table tbody');
+            tbody.innerHTML = data.positions.map(position => `
+                <tr class="stock-row ${position.daybuyqty > 0 ? 'tr-buy' : (position.daysellqty > 0 ? 'tr-sell' : '')}">
                     <td>
-                        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.tsym.split('-')[0]}" 
+                        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${position.tsym.split('-')[0]}" 
                            target="_blank" 
                            class="stock-badge">
-                            ${holding.tsym.split('-')[0]}
+                            ${position.tsym.split('-')[0]}
                         </a>
                     </td>
-                    <td class="fw-bold">${holding.quantity}</td>
-                    <td class="fw-bold price-cell">${holding.avg_price.toFixed(2)}</td>
-                    <td class="fw-bold price-cell">${holding.invested.toFixed(2)}</td>
-                    <td class="fw-bold ${holding.unrealized >= 0 ? 'text-success' : 'text-danger'}">
-                        ₹${holding.unrealized.toFixed(2)}
+                    <td class="fw-bold">${position.quantity}</td>
+                    <td class="fw-bold price-cell">${position.avg_price.toFixed(2)}</td>
+                    <td class="fw-bold price-cell">${position.invested.toFixed(2)}</td>
+                    <td class="fw-bold ${position.unrealized >= 0 ? 'text-success' : 'text-danger'}">
+                        ₹${position.unrealized.toFixed(2)}
                     </td>
                 </tr>
             `).join('');
 
                 // Update footer
-                const footer = document.querySelector('.holdings-table tfoot tr');
+                const footer = document.querySelector('.positions-table tfoot tr');
                 footer.innerHTML = `
                     <td class="fw-bold">Totals</td>
-                    <td class="fw-bold">${data.holdings.reduce((sum, h) => sum + h.quantity, 0)}</td>
+                    <td class="fw-bold">${data.positions.reduce((sum, h) => sum + h.quantity, 0)}</td>
                     <td></td>
                     <td class="fw-bold price-cell">${data.total_invested.toFixed(2)}</td>
                     <td class="fw-bold ${data.total_unrealized >= 0 ? 'text-success' : 'text-danger'}">
@@ -761,7 +761,7 @@ tfoot tr {
                     </td>
                 `;
             })
-            .catch(error => console.error('Error fetching holdings:', error));
+            .catch(error => console.error('Error fetching positions:', error));
     }
 
             setInterval(fetchStocks, 300000);
