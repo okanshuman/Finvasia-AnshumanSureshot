@@ -442,20 +442,21 @@ tfoot tr {
                             {% if position.daybuyqty|int > 0 %}tr-buy
                             {% elif position.daysellqty|int > 0 %}tr-sell
                             {% endif %}">
-        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ position.tsym.split('-')[0] }}" 
-           target="_blank" 
-           class="stock-badge">
-            {{ position.tsym.split('-')[0] }}
-        </a>
-    </td>
-    <td class="fw-bold">{{ position.quantity }}</td>
-    <td class="fw-bold price-cell">{{ "%.2f"|format(position.avg_price) }}</td>
-    <td class="fw-bold price-cell">{{ "%.2f"|format(position.invested) }}</td>
-    <td class="fw-bold {% if position.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
-        ₹{{ "%.2f"|format(position.unrealized) }}
-    </td>
-</tr>
-{% endfor %}
+                            <td>
+                                <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ position.tsym.split('-')[0] }}" 
+                                   target="_blank" 
+                                   class="stock-badge">
+                                    {{ position.tsym.split('-')[0] }}
+                                </a>
+                            </td>
+                            <td class="fw-bold">{{ position.quantity }}</td>
+                            <td class="fw-bold price-cell">{{ "%.2f"|format(position.avg_price) }}</td>
+                            <td class="fw-bold price-cell">{{ "%.2f"|format(position.invested) }}</td>
+                            <td class="fw-bold {% if position.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                ₹{{ "%.2f"|format(position.unrealized) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                     <tfoot>
                         <tr class="bg-light">
