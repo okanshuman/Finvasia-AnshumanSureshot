@@ -395,6 +395,34 @@ tfoot tr {
 }
 .tr-buy { background-color: rgba(16, 218, 151, 0.1) !important; }
 .tr-sell { background-color: rgba(237, 46, 46, 0.1) !important; }
+
+#cash-amount {
+    position: relative;
+    min-width: 150px;
+}
+
+.loading-spinner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.loading-spinner.active {
+    opacity: 0.8;
+}
+
+.amount-text {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.amount-text.updating {
+    opacity: 0.5;
+}
     </style>
 
 </head>
@@ -415,7 +443,10 @@ tfoot tr {
                 </div>
                 <div>
                     <div class="text-sm text-muted mb-1">Available Balance</div>
-                    <div id="cash-amount" class="h2 mb-0 fw-bold">₹–––</div>
+                    <div id="cash-amount" class="h2 mb-0 fw-bold">
+                        <span class="amount-text">????</span>
+                        <div class="loading-spinner d-none"></div>
+                    </div>
                 </div>
             </div>
             <div class="stock-badge d-flex align-items-center gap-2">
@@ -539,6 +570,7 @@ tfoot tr {
         document.addEventListener('DOMContentLoaded', function() {
             const buyButton = document.getElementById('buy-selected');
             const cashAmount = document.getElementById('cash-amount');
+            cashAmount.innerHTML = '<span class="amount-text">₹–––</span><div class="loading-spinner d-none"></div>';
             let purchasedStocks = new Set(JSON.parse(localStorage.getItem('purchasedStocks') || '[]'));
 
             // Load stored amount
@@ -562,18 +594,29 @@ tfoot tr {
             });
 
             function updateCashDisplay() {
-                cashAmount.innerHTML = `<div class="loading-spinner"></div>`;
-                fetch('/api/limits')
-                    .then(response => response.json())
-                    .then(data => {
-                        cashAmount.innerHTML = data.cash ? 
-                            `₹${parseFloat(data.cash).toFixed(2)}` : 
-                            '<span class="text-danger">Error loading balance</span>';
-                    })
-                    .catch(() => {
-                        cashAmount.innerHTML = '<span class="text-danger">Connection Error</span>';
-                    });
+    const amountText = cashAmount.querySelector('.amount-text');
+    const spinner = cashAmount.querySelector('.loading-spinner');
+    
+    // Add loading states
+    spinner.classList.add('active');
+    amountText.classList.add('updating');
+
+    fetch('/api/limits')
+        .then(response => response.json())
+        .then(data => {
+            if (data.cash) {
+                amountText.textContent = `₹${parseFloat(data.cash).toFixed(2)}`;
             }
+        })
+        .catch(() => {
+            amountText.textContent = '₹–––';
+        })
+        .finally(() => {
+            // Remove loading states
+            spinner.classList.remove('active');
+            amountText.classList.remove('updating');
+        });
+}
 
             function updatePurchaseStatus() {
                 document.querySelectorAll('.stock-select').forEach(checkbox => {
@@ -688,7 +731,7 @@ tfoot tr {
             updateBuyButton();
             updatepositionsDisplay();
 
-            setInterval(updateCashDisplay, 15000);
+            setInterval(updateCashDisplay, 7000);
             setInterval(updatepositionsDisplay, 15000); 
 
             function fetchStocks() {
