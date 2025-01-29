@@ -145,7 +145,22 @@ def buy_stocks():
         logging.error(f"Error buying stocks: {e}")
         return jsonify({'error': str(e)}), 500
 
-scheduler.add_job(func=lambda: sell_holding(api), trigger='interval', seconds=15, id='sell_holding_job') #running selling_holding function every 15 seconds
+def should_run_sell_holding():
+    """Check if current time is within market hours."""
+    now = datetime.now()
+    # Market is open on weekdays and between 9:15 AM and 3:30 PM IST
+    if now.weekday() < 5:  # Monday to Friday
+        market_open_time = time(9, 15)  # 9:15 AM
+        market_close_time = time(15, 30)  # 3:30 PM
+        return market_open_time <= now.time() <= market_close_time
+    return False
+
+@scheduler.task('interval', id='sell_holding_job', seconds=15)
+def scheduled_sell_holding():
+    if should_run_sell_holding():
+        sell_holding(api)
+    else:
+        print("Market is closed. sell_holding will not run.")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5004, debug=False)
