@@ -83,7 +83,6 @@ def get_limits():
     try:
         # Fetch the response from the API
         limit_response = api.get_limits()
-        #print(limit_response)
         
         # Calculate available balance
         cash = float(limit_response.get('cash', 0.0))
@@ -146,5 +145,7 @@ def buy_stocks():
         logging.error(f"Error buying stocks: {e}")
         return jsonify({'error': str(e)}), 500
 
+scheduler.add_job(func=lambda: sell_holding(api), trigger='interval', seconds=15, id='sell_holding_job') #running selling_holding function every 15 seconds
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5004, debug=True)
+    app.run(host='0.0.0.0', port=5004, debug=False)

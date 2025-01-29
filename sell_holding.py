@@ -6,14 +6,14 @@ sold_symbols = set()
 def sell_holding(api):
     holdings_response = api.get_holdings()
     
-    print("Fetching holdings...")
+    #print("Fetching holdings...")
     
     # Check if holdings_response is None or empty
     if holdings_response is None or not isinstance(holdings_response, list):
         #print("No valid holdings response received.")
         return
     
-    print(f"Number of holdings found: {len(holdings_response)}")
+    #print(f"Number of holdings found: {len(holdings_response)}")
     
     # Extracting the exchange trading symbols and quantities
     for holding in holdings_response:
@@ -42,17 +42,17 @@ def sell_holding(api):
                 
                 # Skip if this symbol has already been sold
                 if tradingsymbol in sold_symbols:
-                    print(f"{tradingsymbol} has already been sold. Skipping.")
+                    #print(f"{tradingsymbol} has already been sold. Skipping.")
                     continue
                 
                 # Use holdqty as the quantity to sell
                 quantity = holdqty
-                print(f"Available quantity for {tradingsymbol}: {quantity} (holdqty: {holdqty}, usedqty: {usedqty})")
+                #print(f"Available quantity for {tradingsymbol}: {quantity} (holdqty: {holdqty}, usedqty: {usedqty})")
                 
                 # Safely get 'upldprc' (average buy price), default to 0.0 if not present
                 try:
                     averageBuyPrice = float(holding.get('upldprc', 0.0))
-                    print(f"Average buy price for {tradingsymbol}: {averageBuyPrice}")
+                    #print(f"Average buy price for {tradingsymbol}: {averageBuyPrice}")
                 except ValueError:
                     print(f"Invalid average buy price for {tradingsymbol}. Skipping.")
                     continue
@@ -61,7 +61,7 @@ def sell_holding(api):
                 try:
                     currentPrice = getCurrentPriceBySymbolName(api, tradingsymbol)
                     currentPrice = float(currentPrice)
-                    print(f"Current price for {tradingsymbol}: {currentPrice}")
+                    #print(f"Current price for {tradingsymbol}: {currentPrice}")
                 except (ValueError, TypeError):
                     print(f"Invalid current price for {tradingsymbol}. Skipping.")
                     continue
