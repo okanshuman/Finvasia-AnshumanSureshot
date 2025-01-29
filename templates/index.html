@@ -423,6 +423,31 @@ tfoot tr {
 .amount-text.updating {
     opacity: 0.5;
 }
+    
+#refresh-stocks {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+#refresh-stocks:hover {
+    transform: rotate(180deg) scale(1.1);
+    box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.3);
+}
+
+#refresh-stocks.refreshing {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
     </style>
 
 </head>
@@ -454,7 +479,13 @@ tfoot tr {
                 Live Market Data
             </div>
         </div>
-
+        <div class="positions-table mb-5">
+            <!-- Add this heading -->
+            <h2 class="fw-bold mb-3 text-primary">
+                <i class="fas fa-chart-line me-2 header-icon"></i>
+                Open Positions
+            </h2>
+            
         <div class="positions-table mb-5">
             <div class="stock-table">
                 <table class="table table-hover align-middle">
@@ -493,10 +524,10 @@ tfoot tr {
                         <tr class="bg-light">
                             <td class="fw-bold">Totals</td>
                             <td class="fw-bold">{{ positions|sum(attribute='quantity') }}</td>
-                            <td></td>
+                            <td style="padding-left: 5rem;"></td>
                             <td class="fw-bold price-cell">{{ "%.2f"|format(total_invested) }}</td>
                             <td class="fw-bold {% if total_unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                ₹{{ "%.2f"|format(total_unrealized) }}
+                                ?{{ "%.2f"|format(total_unrealized) }}
                             </td>
                         </tr>
                     </tfoot>
@@ -514,6 +545,9 @@ tfoot tr {
             <button id="update-amount" class="btn">
                 <i class="fas fa-sync me-2"></i>
                 Update Amount
+            </button>
+            <button id="refresh-stocks" class="btn" title="Refresh stocks">
+                <i class="fas fa-sync"></i>
             </button>
         </div>
 
@@ -725,6 +759,15 @@ tfoot tr {
                 );
             }
 
+            document.getElementById('refresh-stocks').addEventListener('click', function() {
+            const btn = this;
+            btn.classList.add('refreshing');
+            
+            fetchStocks().finally(() => {
+                btn.classList.remove('refreshing');
+            });
+        }); 
+
             // Initial setup
             updateCashDisplay();
             updatePurchaseStatus();
@@ -810,6 +853,7 @@ tfoot tr {
 
             setInterval(fetchStocks, 300000);
         });
+
     </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"908e745b0fe2e183","version":"2025.1.0","r":1,"token":"79c53ece347a4075a77208d2660a9019","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}' crossorigin="anonymous"></script>
 </body>

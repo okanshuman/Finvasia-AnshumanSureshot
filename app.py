@@ -88,8 +88,9 @@ def get_limits():
         cash = float(limit_response.get('cash', 0.0))
         marginused = float(limit_response.get('marginused', 0.0))
         brkcollamt = float(limit_response.get('brkcollamt', 0.0))
-        
-        available_balance = cash - marginused + brkcollamt
+        payinamt = float(limit_response.get('payin', 0.0))
+                
+        available_balance = cash - marginused + brkcollamt + payinamt
         
         # Return the available balance as "cash"
         return jsonify({'cash': available_balance})
