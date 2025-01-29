@@ -778,40 +778,40 @@ tfoot tr {
             setInterval(updatepositionsDisplay, 15000); 
 
             function fetchStocks() {
-                fetch('/api/stocks')
-                    .then(response => response.json())
-                    .then(stocks => {
-                        const tbody = document.getElementById('stock-table-body');
-                        tbody.innerHTML = stocks.map(stock => `
-                            <tr class="stock-row ${purchasedStocks.has(stock.symbol) ? 'disabled' : ''}" data-symbol="${stock.symbol}">
-                                <td>
-                                    <input type="checkbox" 
-                                           class="form-check-input stock-select"
-                                           data-name="${stock.name}"
-                                           data-symbol="${stock.symbol}"
-                                           data-price="${stock.current_price}"
-                                           ${purchasedStocks.has(stock.symbol) ? 'disabled' : ''}>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="fw-semibold">${stock.name}</div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${stock.symbol}" target="_blank" class="stock-badge">
-                                        ${stock.symbol}
-                                    </a>
-                                </td>
-                                <td class="fw-bold price-cell">${stock.current_price}</td>
-                                <td class="date-column text-muted">${stock.date}</td>
-                            </tr>
-                        `).join('');
+    return fetch('/api/stocks')  // Added return statement
+        .then(response => response.json())
+        .then(stocks => {
+            const tbody = document.getElementById('stock-table-body');
+            tbody.innerHTML = stocks.map(stock => `
+                <tr class="stock-row ${purchasedStocks.has(stock.symbol) ? 'disabled' : ''}" data-symbol="${stock.symbol}">
+                    <td>
+                        <input type="checkbox" 
+                               class="form-check-input stock-select"
+                               data-name="${stock.name}"
+                               data-symbol="${stock.symbol}"
+                               data-price="${stock.current_price}"
+                               ${purchasedStocks.has(stock.symbol) ? 'disabled' : ''}>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="fw-semibold">${stock.name}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${stock.symbol}" target="_blank" class="stock-badge">
+                            ${stock.symbol}
+                        </a>
+                    </td>
+                    <td class="fw-bold price-cell">${stock.current_price}</td>
+                    <td class="date-column text-muted">${stock.date}</td>
+                </tr>
+            `).join('');
 
-                        updatePurchaseStatus();
-                        updateBuyButton();
-                    })
-                    .catch(console.error);
-            }
+            updatePurchaseStatus();
+            updateBuyButton();
+        })
+        .catch(console.error);
+}
 
             function updatepositionsDisplay() {
                 fetch('/api/positions')

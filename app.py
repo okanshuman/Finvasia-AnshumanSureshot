@@ -75,6 +75,7 @@ def get_positions():
 
 @app.route('/api/stocks')
 def get_stocks():
+    fetch_stocks(stock_data, positions_symbols)
     return jsonify(stock_data)
 
 @app.route('/api/limits')
