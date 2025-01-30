@@ -623,13 +623,14 @@ tfoot tr {
                     <tr>
                         <th>Symbol</th>
                         <th>Quantity</th>
-                        <th>Used Qty</th>
-                        <th>Avg. Price</th>
-                        <th>Status</th>
+                        <th>Invested</th>
+                        <th>Daily P/L%</th>
+                        <th>Overall P/L%</th>
+                        <th>Buy More</th>
                     </tr>
                 </thead>
                 <tbody id="holdings-body">
-                    
+                   
                 </tbody>
             </table>
         </div>
@@ -669,7 +670,7 @@ tfoot tr {
         .then(data => {
             const tbody = document.getElementById('holdings-body');
             tbody.innerHTML = data.holdings.map(holding => `
-                <tr class="${holding.sold ? 'tr-sell' : ''}">
+                <tr>
                     <td>
                         <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.symbol}" 
                            target="_blank" 
@@ -678,15 +679,87 @@ tfoot tr {
                         </a>
                     </td>
                     <td class="fw-bold">${holding.quantity}</td>
-                    <td class="fw-bold">${holding.used_quantity}</td>
-                    <td class="fw-bold price-cell">${holding.average_price.toFixed(2)}</td>
+                    <td class="fw-bold price-cell">₹${holding.invested.toFixed(2)}</td>
+                    <td class="fw-bold ${holding.pl_percent >= 0 ? 'text-success' : 'text-danger'}">
+                        ${holding.pl_percent.toFixed(2)}%
+                    </td>
+                    <td class="fw-bold ${holding.overall_pl_percent >= 0 ? 'text-success' : 'text-danger'}">
+                        ${holding.overall_pl_percent.toFixed(2)}%
+                    </td>
                     <td>
-                        <span class="stock-badge ${holding.sold ? 'bg-danger' : 'bg-success'}">
-                            ${holding.sold ? 'Sold' : 'Holding'}
-                        </span>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="input-group" style="max-width: 120px;">
+                                <button class="btn btn-sm btn-outline-secondary quantity-down" 
+                                        type="button">−</button>
+                                <input type="number" 
+                                       class="form-control text-center quantity-input" 
+                                       value="1" 
+                                       min="1" 
+                                       style="padding: 0.25rem;">
+                                <button class="btn btn-sm btn-outline-secondary quantity-up" 
+                                        type="button">+</button>
+                            </div>
+                            <button class="btn btn-sm btn-success buy-more" 
+                                    data-symbol="${holding.symbol}"
+                                    data-price="${holding.current_price}">
+                                Buy
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
+
+            // Add event listeners for quantity controls
+            tbody.querySelectorAll('.quantity-up').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const input = btn.parentElement.querySelector('.quantity-input');
+                    input.value = parseInt(input.value) + 1;
+                });
+            });
+
+            tbody.querySelectorAll('.quantity-down').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const input = btn.parentElement.querySelector('.quantity-input');
+                    input.value = Math.max(1, parseInt(input.value) - 1);
+                });
+            });
+
+            // Add event listeners for buy buttons
+            tbody.querySelectorAll('.buy-more').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const symbol = btn.dataset.symbol;
+                    const quantity = parseInt(btn.parentElement.querySelector('.quantity-input').value);
+                    const price = parseFloat(btn.dataset.price);
+                    
+                    btn.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div>`;
+                    
+                    fetch('/buy_stocks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            stocks: [{
+                                symbol: symbol,
+                                price: price
+                            }],
+                            quantity: quantity
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            showToast(`Successfully bought ${quantity} shares of ${symbol}`, 'success');
+                            updateHoldingsDisplay();
+                            updateCashDisplay();
+                        }
+                    })
+                    .catch(error => {
+                        showToast(`Error buying ${symbol}: ${error.message}`, 'error');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = 'Buy';
+                    });
+                });
+            });
         })
         .catch(error => console.error('Error fetching holdings:', error));
 }

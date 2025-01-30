@@ -104,9 +104,7 @@ def buy_stocks():
         data = request.json
         stocks_to_buy = data.get('stocks', [])
         amount = data.get('amount', 5000)
-        
-        if not isinstance(amount, (int, float)) or amount < 1000:
-            return jsonify({'error': 'Invalid investment amount (minimum ₹1000)'}), 400
+        quantity = data.get('quantity')
 
         results = []
         new_purchases = set()
@@ -114,32 +112,27 @@ def buy_stocks():
         for stock in stocks_to_buy:
             trading_symbol_name = stock['symbol']
             correct_symbol_name = getSymbolNameFinvasia(api, trading_symbol_name)
-            current_price = stock['price']
-            quantity = int(amount / current_price)
 
-            if quantity < 1:
-                continue  # Skip stocks where quantity would be zero
+            if quantity:
+                qty = quantity
+            else:
+                current_price = stock['price']
+                qty = int(amount / current_price)
+                if qty < 1:
+                    logging.warning(f"Insufficient funds to buy {stock['symbol']}")
+                    continue
 
-            order_response = placeOrder(api, buy_or_sell='B', 
-                                      tradingsymbol=correct_symbol_name, 
-                                      quantity=quantity)
-            
+            order_response = placeOrder(api, buy_or_sell='B', tradingsymbol=correct_symbol_name, quantity=qty)
+
             results.append({
                 'symbol': stock['symbol'],
-                'quantity': quantity,
+                'quantity': qty,
                 'order_response': order_response
             })
-            
+
             new_purchases.add(stock['symbol'])
 
-        # Update purchased stocks
-        global purchased_stocks
-        purchased_stocks.update(new_purchases)
-
-        return jsonify({
-            'message': f'Successfully placed orders for {len(results)} stocks',
-            'results': results
-        }), 200
+        return jsonify({'results': results, 'new_purchases': list(new_purchases)})
 
     except Exception as e:
         logging.error(f"Error buying stocks: {e}")
@@ -162,13 +155,33 @@ def get_holdings():
                         tradingsymbol = tsym_info['tsym']
                         break
                 
-                if tradingsymbol:  # Only add holdings with valid NSE symbols
+                if tradingsymbol:
+                    qty = int(holding.get('holdqty', 0))
+                    used_qty = int(holding.get('usedqty', 0))
+                    avg_price = float(holding.get('upldprc', 0.0))
+                    
+                    # Skip if quantity equals used quantity
+                    if qty == used_qty:
+                        continue
+                    
+                    # Get current price
+                    current_price = getCurrentPriceBySymbolName(api, tradingsymbol)
+                    current_price = float(current_price) if current_price else avg_price
+                    
+                    # Calculate P/L percentages
+                    pl_percent = ((current_price - avg_price) / avg_price * 100) if avg_price else 0
+                    invested = avg_price * qty
+                    overall_pl_percent = ((current_price * qty - invested) / invested * 100) if invested else 0
+
                     holdings.append({
                         'symbol': tradingsymbol,
-                        'quantity': int(holding.get('holdqty', 0)),
-                        'used_quantity': int(holding.get('usedqty', 0)),
-                        'average_price': float(holding.get('upldprc', 0.0)),
-                        'sold': tradingsymbol in sold_symbols  # Now using imported variable
+                        'quantity': qty,
+                        'used_quantity': used_qty,
+                        'average_price': avg_price,
+                        'current_price': current_price,
+                        'pl_percent': pl_percent,
+                        'overall_pl_percent': overall_pl_percent,
+                        'invested': invested
                     })
 
         return jsonify({'holdings': holdings})
@@ -176,6 +189,7 @@ def get_holdings():
     except Exception as e:
         logging.error(f"Error fetching holdings: {e}")
         return jsonify({'error': str(e)}), 500
+
 def should_run_sell_holding():
     """Check if current time is within market hours."""
     now = datetime.now()
