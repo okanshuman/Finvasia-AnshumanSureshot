@@ -912,9 +912,11 @@ tfoot tr {
             updatepositionsDisplay();
             updateHoldingsDisplay();
 
-            setInterval(updateCashDisplay, 7000);
-            setInterval(updatepositionsDisplay, 15000); 
-
+            setInterval(updateCashDisplay, 5000);
+            setInterval(updatepositionsDisplay, 5000); 
+            setInterval(fetchStocks, 600000);
+            setInterval(updateHoldingsDisplay, 5000);
+            
             function fetchStocks() {
     return fetch('/api/stocks')  // Added return statement
         .then(response => response.json())
@@ -989,8 +991,6 @@ tfoot tr {
             .catch(error => console.error('Error fetching positions:', error));
     }
             
-            setInterval(updateHoldingsDisplay, 15000);
-            setInterval(fetchStocks, 300000);
         });
 
     </script>
