@@ -4,7 +4,7 @@ import logging
 from fetch_and_buy_stock import fetch_stocks
 from order_management import *
 import credentials as cr
-from sell_holding import sell_holding
+from sell_holding import *
 from datetime import datetime, time
 
 app = Flask(__name__)
@@ -145,6 +145,37 @@ def buy_stocks():
         logging.error(f"Error buying stocks: {e}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/holdings')
+def get_holdings():
+    try:
+        holdings_response = api.get_holdings()
+        holdings = []
+        
+        if holdings_response is None or not isinstance(holdings_response, list):
+            return jsonify({'holdings': holdings})
+
+        for holding in holdings_response:
+            if holding.get('stat') == 'Ok':
+                tradingsymbol = None
+                for tsym_info in holding.get('exch_tsym', []):
+                    if tsym_info['exch'] == 'NSE':
+                        tradingsymbol = tsym_info['tsym']
+                        break
+                
+                if tradingsymbol:  # Only add holdings with valid NSE symbols
+                    holdings.append({
+                        'symbol': tradingsymbol,
+                        'quantity': int(holding.get('holdqty', 0)),
+                        'used_quantity': int(holding.get('usedqty', 0)),
+                        'average_price': float(holding.get('upldprc', 0.0)),
+                        'sold': tradingsymbol in sold_symbols  # Now using imported variable
+                    })
+
+        return jsonify({'holdings': holdings})
+    
+    except Exception as e:
+        logging.error(f"Error fetching holdings: {e}")
+        return jsonify({'error': str(e)}), 500
 def should_run_sell_holding():
     """Check if current time is within market hours."""
     now = datetime.now()

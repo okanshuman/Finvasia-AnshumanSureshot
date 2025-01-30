@@ -487,7 +487,6 @@ tfoot tr {
             </div>
         </div>
         <div class="positions-table mb-5">
-            <!-- Add this heading -->
             <h2 class="fw-bold mb-3 text-primary">
                 <i class="fas fa-chart-line me-2 header-icon"></i>
                 Open Positions
@@ -613,6 +612,29 @@ tfoot tr {
         </div>
     </div>
 
+    <div class="holdings-table mb-5">
+        <h2 class="fw-bold mb-3 text-primary">
+            <i class="fas fa-boxes me-2 header-icon"></i>
+            Current Holdings
+        </h2>
+        <div class="stock-table">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Quantity</th>
+                        <th>Used Qty</th>
+                        <th>Avg. Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="holdings-body">
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -640,6 +662,34 @@ tfoot tr {
                 localStorage.setItem('investmentAmount', amount);
                 showToast('Amount updated successfully!', 'success');
             });
+
+            function updateHoldingsDisplay() {
+    fetch('/api/holdings')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('holdings-body');
+            tbody.innerHTML = data.holdings.map(holding => `
+                <tr class="${holding.sold ? 'tr-sell' : ''}">
+                    <td>
+                        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.symbol}" 
+                           target="_blank" 
+                           class="stock-badge">
+                            ${holding.symbol}
+                        </a>
+                    </td>
+                    <td class="fw-bold">${holding.quantity}</td>
+                    <td class="fw-bold">${holding.used_quantity}</td>
+                    <td class="fw-bold price-cell">${holding.average_price.toFixed(2)}</td>
+                    <td>
+                        <span class="stock-badge ${holding.sold ? 'bg-danger' : 'bg-success'}">
+                            ${holding.sold ? 'Sold' : 'Holding'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => console.error('Error fetching holdings:', error));
+}
 
             function updateCashDisplay() {
     const amountText = cashAmount.querySelector('.amount-text');
@@ -787,6 +837,7 @@ tfoot tr {
             updatePurchaseStatus();
             updateBuyButton();
             updatepositionsDisplay();
+            updateHoldingsDisplay();
 
             setInterval(updateCashDisplay, 7000);
             setInterval(updatepositionsDisplay, 15000); 
@@ -864,7 +915,8 @@ tfoot tr {
             })
             .catch(error => console.error('Error fetching positions:', error));
     }
-
+            
+            setInterval(updateHoldingsDisplay, 15000);
             setInterval(fetchStocks, 300000);
         });
 
