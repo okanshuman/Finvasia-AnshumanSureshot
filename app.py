@@ -166,12 +166,16 @@ def get_holdings():
                     
                     # Get current price
                     current_price = getCurrentPriceBySymbolName(api, tradingsymbol)
+                    print(current_price)
                     current_price = float(current_price) if current_price else avg_price
+                    print(current_price)
                     
-                    # Calculate P/L percentages
+                    # Calculate P/L percentages and amounts
                     pl_percent = ((current_price - avg_price) / avg_price * 100) if avg_price else 0
                     invested = avg_price * qty
                     overall_pl_percent = ((current_price * qty - invested) / invested * 100) if invested else 0
+                    pl_amount = (current_price - avg_price) * qty
+                    overall_pl_amount = (current_price * qty) - invested
 
                     holdings.append({
                         'symbol': tradingsymbol,
@@ -180,7 +184,9 @@ def get_holdings():
                         'average_price': avg_price,
                         'current_price': current_price,
                         'pl_percent': pl_percent,
+                        'pl_amount': pl_amount,  # Add this line
                         'overall_pl_percent': overall_pl_percent,
+                        'overall_pl_amount': overall_pl_amount,  # Add this line
                         'invested': invested
                     })
 

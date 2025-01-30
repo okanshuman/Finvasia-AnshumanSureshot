@@ -624,7 +624,9 @@ tfoot tr {
                         <th>Symbol</th>
                         <th>Quantity</th>
                         <th>Invested</th>
+                        <th>Daily P/L Amount</th>  <!-- New Column -->
                         <th>Daily P/L%</th>
+                        <th>Overall P/L Amount</th>  <!-- New Column -->
                         <th>Overall P/L%</th>
                         <th>Buy More</th>
                     </tr>
@@ -680,12 +682,18 @@ tfoot tr {
                     </td>
                     <td class="fw-bold">${holding.quantity}</td>
                     <td class="fw-bold price-cell">₹${holding.invested.toFixed(2)}</td>
-                    <td class="fw-bold ${holding.pl_percent >= 0 ? 'text-success' : 'text-danger'}">
-                        ${holding.pl_percent.toFixed(2)}%
-                    </td>
-                    <td class="fw-bold ${holding.overall_pl_percent >= 0 ? 'text-success' : 'text-danger'}">
-                        ${holding.overall_pl_percent.toFixed(2)}%
-                    </td>
+<td class="fw-bold ${holding.pl_amount >= 0 ? 'text-success' : 'text-danger'}">
+    ₹${holding.pl_amount.toFixed(2)}
+</td>
+<td class="fw-bold ${holding.pl_percent >= 0 ? 'text-success' : 'text-danger'}">
+    ${holding.pl_percent.toFixed(2)}%
+</td>
+<td class="fw-bold ${holding.overall_pl_amount >= 0 ? 'text-success' : 'text-danger'}">
+    ₹${holding.overall_pl_amount.toFixed(2)}
+</td>
+<td class="fw-bold ${holding.overall_pl_percent >= 0 ? 'text-success' : 'text-danger'}">
+    ${holding.overall_pl_percent.toFixed(2)}%
+</td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <div class="input-group" style="max-width: 120px;">
