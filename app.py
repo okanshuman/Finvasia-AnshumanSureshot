@@ -184,13 +184,13 @@ def buy_stocks():
 
             new_purchases.add(stock['symbol'])
             
-            for stock in stocks_to_buy:
-                update_trade_history_buy(
-                    symbol=stock['symbol'],
-                    name=stock['name'],
-                    quantity=qty,
-                    price=stock['price']
-                )
+            # Update trade history with the correct qty here
+            update_trade_history_buy(
+                symbol=stock['symbol'],
+                name=stock.get('name', 'Unknown'),
+                quantity=qty,
+                price=stock['price']
+            )
                 
         return jsonify({'results': results, 'new_purchases': list(new_purchases)})
 
@@ -217,6 +217,7 @@ def get_holdings():
                         break
                 
                 if tradingsymbol:
+                    stock_name = getSymbolNameFinvasia(api, tradingsymbol)
                     qty = int(holding.get('holdqty', 0))
                     used_qty = int(holding.get('usedqty', 0))
                     avg_price = float(holding.get('upldprc', 0.0))
@@ -238,6 +239,7 @@ def get_holdings():
 
                     holdings.append({
                         'symbol': tradingsymbol,
+                        'name': stock_name,
                         'quantity': qty,
                         'used_quantity': used_qty,
                         'average_price': avg_price,

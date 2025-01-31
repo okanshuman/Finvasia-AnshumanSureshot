@@ -746,6 +746,7 @@
             </div>
             <button class="btn btn-sm btn-success buy-more" 
                     data-symbol="${holding.symbol}"
+                    data-name="${holding.name}" 
                     data-price="${holding.current_price}">
                 Buy
             </button>
@@ -801,7 +802,7 @@
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({
-                                                    stocks: [{ symbol: symbol, price: price }],
+                                                    stocks: [{ symbol: symbol,name: btn.dataset.name, price: price }],
                                                     quantity: quantity
                                                 })
                                             })
