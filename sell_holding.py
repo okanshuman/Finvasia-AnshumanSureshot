@@ -1,6 +1,7 @@
 # sell_holding
 from order_management import *
 from app import load_dont_sell_list
+from trade_history import update_trade_history_sell
 
 # Initialize a set to keep track of sold trading symbols
 sold_symbols = set()
@@ -85,6 +86,7 @@ def sell_holding(api):
                         # Add the symbol to the sold symbols set only if order was successful
                         if order_response and isinstance(order_response, dict) and order_response.get('stat') == 'Ok':
                             sold_symbols.add(tradingsymbol)
+                            update_trade_history_sell(tradingsymbol, currentPrice)
                         else:
                             print(f"Order placement failed for {tradingsymbol}")
                             

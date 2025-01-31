@@ -9,6 +9,7 @@ import sell_holding
 from datetime import datetime, time
 import json
 import os
+from trade_history import update_trade_history_buy, load_trade_history
 
 app = Flask(__name__)
 
@@ -41,6 +42,18 @@ def save_dont_sell_list(symbols):
     with open(DONT_SELL_FILE, 'w') as f:
         json.dump(symbols, f)
 
+@app.route('/trades')
+def trades():
+    return render_template('trades.html')
+
+@app.route('/trades')
+def trade_history_page():
+    return render_template('trades.html')
+
+@app.route('/api/trade_history')
+def get_trade_history():
+    return jsonify(load_trade_history())
+        
 @app.route('/api/dont_sell', methods=['POST'])
 def toggle_dont_sell():
     data = request.json
@@ -170,7 +183,15 @@ def buy_stocks():
             })
 
             new_purchases.add(stock['symbol'])
-
+            
+            for stock in stocks_to_buy:
+                update_trade_history_buy(
+                    symbol=stock['symbol'],
+                    name=stock['name'],
+                    quantity=qty,
+                    price=stock['price']
+                )
+                
         return jsonify({'results': results, 'new_purchases': list(new_purchases)})
 
     except Exception as e:
