@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -249,7 +250,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .stock-badge {
@@ -293,11 +296,12 @@
             .container-xl {
                 padding: 1.5rem;
             }
-            
-            .table td, .table th {
+
+            .table td,
+            .table th {
                 padding: 1rem;
             }
-            
+
             .date-column {
                 display: none;
             }
@@ -309,10 +313,10 @@
             }
 
             #refresh-stocks {
-        margin-left: 0;
-        width: 100%;
-        margin-top: 1rem;
-    }
+                margin-left: 0;
+                width: 100%;
+                margin-top: 1rem;
+            }
 
             #buy-selected {
                 width: 100%;
@@ -324,7 +328,7 @@
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
-            
+
             .stock-table table {
                 min-width: 600px;
             }
@@ -333,7 +337,7 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             #investment-amount {
                 width: 100%;
             }
@@ -346,8 +350,15 @@
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .fade-in {
@@ -355,8 +366,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .stock-row {
@@ -380,94 +396,109 @@
         }
 
         .positions-table {
-    margin-bottom: 2rem;
-}
+            margin-bottom: 2rem;
+        }
 
-tfoot tr {
-    background: rgba(99, 102, 241, 0.05);
-    border-top: 2px solid rgba(99, 102, 241, 0.1);
-}
+        tfoot tr {
+            background: rgba(99, 102, 241, 0.05);
+            border-top: 2px solid rgba(99, 102, 241, 0.1);
+        }
 
-.text-success {
-    color: var(--success-color) !important;
-}
+        .text-success {
+            color: var(--success-color) !important;
+        }
 
-.text-danger {
-    color: #ef4444 !important;
-}
+        .text-danger {
+            color: #ef4444 !important;
+        }
 
-.bg-light {
-    background-color: rgba(241, 245, 249, 0.4) !important;
-}
-.tr-buy { background-color: rgba(16, 218, 151, 0.1) !important; }
-.tr-sell { background-color: rgba(237, 46, 46, 0.1) !important; }
+        .bg-light {
+            background-color: rgba(241, 245, 249, 0.4) !important;
+        }
 
-#cash-amount {
-    position: relative;
-    min-width: 150px;
-}
+        .tr-buy {
+            background-color: rgba(16, 218, 151, 0.1) !important;
+        }
 
-.loading-spinner {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
+        .tr-sell {
+            background-color: rgba(237, 46, 46, 0.1) !important;
+        }
 
-.loading-spinner.active {
-    opacity: 0.8;
-}
+        #cash-amount {
+            position: relative;
+            min-width: 150px;
+        }
 
-.amount-text {
-    opacity: 1;
-    transition: opacity 0.2s ease;
-}
+        .loading-spinner {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
 
-.amount-text.updating {
-    opacity: 0.5;
-}
-    
-#refresh-stocks {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
-    color: white;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    margin-left: auto;
-}
+        .loading-spinner.active {
+            opacity: 0.8;
+        }
 
-#refresh-stocks:hover {
-    transform: rotate(180deg) scale(1.1);
-    box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.3);
-}
+        .amount-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+        }
 
-#refresh-stocks.refreshing {
-    animation: spin 1s linear infinite;
-}
+        .amount-text.updating {
+            opacity: 0.5;
+        }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+        #refresh-stocks {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+
+        #refresh-stocks:hover {
+            transform: rotate(180deg) scale(1.1);
+            box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.3);
+        }
+
+        #refresh-stocks.refreshing {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .dont-sell-checkbox {
+            width: 1.2em;
+            height: 1.2em;
+            cursor: pointer;
+            accent-color: var(--success-color);
+        }
     </style>
 
 </head>
+
 <body>
     <div id="notifications-container"></div>
-    
+
     <div class="container-xl">
         <div class="d-flex align-items-center justify-content-center gap-3 mb-5">
-            <img src="https://pimwp.s3-accelerate.amazonaws.com/2023/05/shoonya_by_finvasia-Logo.png" 
-            alt="Finvasia" 
-            style="height: 48px;">
+            <img src="https://pimwp.s3-accelerate.amazonaws.com/2023/05/shoonya_by_finvasia-Logo.png" alt="Finvasia"
+                style="height: 48px;">
         </div>
-        
+
         <div id="cash-display">
             <div class="d-flex align-items-center gap-3">
                 <div class="balance-icon">
@@ -491,365 +522,394 @@ tfoot tr {
                 <i class="fas fa-chart-line me-2 header-icon"></i>
                 Open Positions
             </h2>
-            
-        <div class="positions-table mb-5">
+
+            <div class="positions-table mb-5">
+                <div class="stock-table">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Quantity</th>
+                                <th>Avg. Price</th>
+                                <th>Invested</th>
+                                <th>Unrealized P/L</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for position in positions %}
+                            <tr class="stock-row 
+                            {% if position.daybuyqty|int > 0 %}tr-buy
+                            {% elif position.daysellqty|int > 0 %}tr-sell
+                            {% endif %}">
+                                <td>
+                                    <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ position.tsym.split('-')[0] }}"
+                                        target="_blank" class="stock-badge">
+                                        {{ position.tsym.split('-')[0] }}
+                                    </a>
+                                </td>
+                                <td class="fw-bold">{{ position.quantity }}</td>
+                                <td class="fw-bold price-cell">{{ "%.2f"|format(position.avg_price) }}</td>
+                                <td class="fw-bold price-cell">{{ "%.2f"|format(position.invested) }}</td>
+                                <td
+                                    class="fw-bold {% if position.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    ₹{{ "%.2f"|format(position.unrealized) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-light">
+                                <td class="fw-bold">Totals</td>
+                                <td class="fw-bold">{{ positions|sum(attribute='quantity') }}</td>
+                                <td style="padding-left: 5rem;"></td>
+                                <td class="fw-bold price-cell">{{ "%.2f"|format(total_invested) }}</td>
+                                <td
+                                    class="fw-bold {% if total_unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    ?{{ "%.2f"|format(total_unrealized) }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="identified-stocks mb-5">
+                <h2 class="fw-bold mb-3 text-primary">
+                    <i class="fas fa-bullseye me-2 header-icon"></i>
+                    Identified Stocks
+                </h2>
+            </div>
+
+            <div class="investment-controls">
+                <input type="number" id="investment-amount" min="1000" step="500" placeholder="Enter amount per stock"
+                    value="5000">
+                <button id="update-amount" class="btn">
+                    <i class="fas fa-sync me-2"></i>
+                    Update Amount
+                </button>
+                <button id="refresh-stocks" class="btn" title="Refresh stocks">
+                    <i class="fas fa-sync"></i>
+                </button>
+            </div>
+
             <div class="stock-table">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
+                            <th style="width: 50px;"></th>
+                            <th>Company</th>
                             <th>Symbol</th>
-                            <th>Quantity</th>
-                            <th>Avg. Price</th>
-                            <th>Invested</th>
-                            <th>Unrealized P/L</th>
+                            <th>Price</th>
+                            <th class="date-column">Date Identified</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for position in positions %}
-                        <tr class="stock-row 
-                            {% if position.daybuyqty|int > 0 %}tr-buy
-                            {% elif position.daysellqty|int > 0 %}tr-sell
-                            {% endif %}">
+                    <tbody id="stock-table-body">
+                        {% for stock in stocks %}
+                        <tr class="stock-row {% if stock.symbol in purchased_stocks %}disabled{% endif %}"
+                            data-symbol="{{ stock.symbol }}">
                             <td>
-                                <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ position.tsym.split('-')[0] }}" 
-                                   target="_blank" 
-                                   class="stock-badge">
-                                    {{ position.tsym.split('-')[0] }}
+                                <input type="checkbox" class="form-check-input stock-select"
+                                    data-name="{{ stock.name }}" data-symbol="{{ stock.symbol }}"
+                                    data-price="{{ stock.current_price }}" {{ 'disabled' if stock.symbol in
+                                    purchased_stocks }}>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="fw-semibold">{{ stock.name }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ stock.symbol }}"
+                                    target="_blank" class="stock-badge">
+                                    {{ stock.symbol }}
                                 </a>
                             </td>
-                            <td class="fw-bold">{{ position.quantity }}</td>
-                            <td class="fw-bold price-cell">{{ "%.2f"|format(position.avg_price) }}</td>
-                            <td class="fw-bold price-cell">{{ "%.2f"|format(position.invested) }}</td>
-                            <td class="fw-bold {% if position.unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                ₹{{ "%.2f"|format(position.unrealized) }}
-                            </td>
+                            <td class="fw-bold price-cell">{{ stock.current_price }}</td>
+                            <td class="date-column text-muted">{{ stock.date }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
-                    <tfoot>
-                        <tr class="bg-light">
-                            <td class="fw-bold">Totals</td>
-                            <td class="fw-bold">{{ positions|sum(attribute='quantity') }}</td>
-                            <td style="padding-left: 5rem;"></td>
-                            <td class="fw-bold price-cell">{{ "%.2f"|format(total_invested) }}</td>
-                            <td class="fw-bold {% if total_unrealized >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                ?{{ "%.2f"|format(total_unrealized) }}
-                            </td>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <button id="buy-selected" class="btn" disabled>
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Buy Selected Stocks
+                </button>
+            </div>
+        </div>
+
+        <div class="holdings-table mb-5">
+            <h2 class="fw-bold mb-3 text-primary">
+                <i class="fas fa-boxes me-2 header-icon"></i>
+                Current Holdings
+            </h2>
+            <div class="stock-table">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Don't Sell</th>
+                            <th>Symbol</th>
+                            <th>Quantity</th>
+                            <th>Invested</th>
+                            <th>Daily P/L Amount</th>
+                            <th>Daily P/L%</th>
+                            <th>Overall P/L Amount</th>
+                            <th>Overall P/L%</th>
+                            <th>Buy More</th>
                         </tr>
-                    </tfoot>
+                    </thead>
+                    <tbody id="holdings-body">
+
+                    </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="identified-stocks mb-5">
-            <h2 class="fw-bold mb-3 text-primary">
-                <i class="fas fa-bullseye me-2 header-icon"></i>
-                Identified Stocks
-            </h2>
-        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const buyButton = document.getElementById('buy-selected');
+                const cashAmount = document.getElementById('cash-amount');
+                cashAmount.innerHTML = '<span class="amount-text">₹–––</span><div class="loading-spinner d-none"></div>';
+                let purchasedStocks = new Set(JSON.parse(localStorage.getItem('purchasedStocks') || '[]'));
 
-        <div class="investment-controls">
-            <input type="number" 
-                   id="investment-amount" 
-                   min="1000" 
-                   step="500" 
-                   placeholder="Enter amount per stock"
-                   value="5000">
-            <button id="update-amount" class="btn">
-                <i class="fas fa-sync me-2"></i>
-                Update Amount
-            </button>
-            <button id="refresh-stocks" class="btn" title="Refresh stocks">
-                <i class="fas fa-sync"></i>
-            </button>
-        </div>
-
-        <div class="stock-table">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;"></th>
-                        <th>Company</th>
-                        <th>Symbol</th>
-                        <th>Price</th>
-                        <th class="date-column">Date Identified</th>
-                    </tr>
-                </thead>
-                <tbody id="stock-table-body">
-                    {% for stock in stocks %}
-                    <tr class="stock-row {% if stock.symbol in purchased_stocks %}disabled{% endif %}" data-symbol="{{ stock.symbol }}">
-                        <td>
-                            <input type="checkbox" 
-                                   class="form-check-input stock-select"
-                                   data-name="{{ stock.name }}"
-                                   data-symbol="{{ stock.symbol }}"
-                                   data-price="{{ stock.current_price }}"
-                                   {{ 'disabled' if stock.symbol in purchased_stocks }}>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="fw-semibold">{{ stock.name }}</div>
-                            </div>
-                        </td>
-                        <td>
-                            <a href="https://www.tradingview.com/chart/?symbol=NSE%3A{{ stock.symbol }}" target="_blank" class="stock-badge">
-                                {{ stock.symbol }}
-                            </a>
-                        </td>
-                        <td class="fw-bold price-cell">{{ stock.current_price }}</td>
-                        <td class="date-column text-muted">{{ stock.date }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="d-flex justify-content-end mt-4">
-            <button id="buy-selected" class="btn" disabled>
-                <i class="fas fa-shopping-cart me-2"></i>
-                Buy Selected Stocks
-            </button>
-        </div>
-    </div>
-
-    <div class="holdings-table mb-5">
-        <h2 class="fw-bold mb-3 text-primary">
-            <i class="fas fa-boxes me-2 header-icon"></i>
-            Current Holdings
-        </h2>
-        <div class="stock-table">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Symbol</th>
-                        <th>Quantity</th>
-                        <th>Invested</th>
-                        <th>Daily P/L Amount</th>  <!-- New Column -->
-                        <th>Daily P/L%</th>
-                        <th>Overall P/L Amount</th>  <!-- New Column -->
-                        <th>Overall P/L%</th>
-                        <th>Buy More</th>
-                    </tr>
-                </thead>
-                <tbody id="holdings-body">
-                   
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const buyButton = document.getElementById('buy-selected');
-            const cashAmount = document.getElementById('cash-amount');
-            cashAmount.innerHTML = '<span class="amount-text">₹–––</span><div class="loading-spinner d-none"></div>';
-            let purchasedStocks = new Set(JSON.parse(localStorage.getItem('purchasedStocks') || '[]'));
-
-            // Load stored amount
-            const storedAmount = localStorage.getItem('investmentAmount');
-            if (storedAmount) {
-                document.getElementById('investment-amount').value = storedAmount;
-            }
-
-            // Update amount handler
-            document.getElementById('update-amount').addEventListener('click', function() {
-                const amountInput = document.getElementById('investment-amount');
-                const amount = parseInt(amountInput.value);
-                
-                if (isNaN(amount) || amount < 1000) {
-                    showToast('Minimum amount is ₹1000', 'error');
-                    return;
+                // Load stored amount
+                const storedAmount = localStorage.getItem('investmentAmount');
+                if (storedAmount) {
+                    document.getElementById('investment-amount').value = storedAmount;
                 }
 
-                localStorage.setItem('investmentAmount', amount);
-                showToast('Amount updated successfully!', 'success');
-            });
+                // Update amount handler
+                document.getElementById('update-amount').addEventListener('click', function () {
+                    const amountInput = document.getElementById('investment-amount');
+                    const amount = parseInt(amountInput.value);
 
-            function updateHoldingsDisplay() {
-    fetch('/api/holdings')
+                    if (isNaN(amount) || amount < 1000) {
+                        showToast('Minimum amount is ₹1000', 'error');
+                        return;
+                    }
+
+                    localStorage.setItem('investmentAmount', amount);
+                    showToast('Amount updated successfully!', 'success');
+                });
+
+                function updateHoldingsDisplay() {
+    // First fetch the don't sell list
+    fetch('/api/dont_sell')
         .then(response => response.json())
-        .then(data => {
-            const tbody = document.getElementById('holdings-body');
-            tbody.innerHTML = data.holdings.map(holding => `
-                <tr>
-                    <td>
-                        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.symbol}" 
-                           target="_blank" 
-                           class="stock-badge">
-                            ${holding.symbol}
-                        </a>
-                    </td>
-                    <td class="fw-bold">${holding.quantity}</td>
-                    <td class="fw-bold price-cell">₹${holding.invested.toFixed(2)}</td>
-<td class="fw-bold ${holding.pl_amount >= 0 ? 'text-success' : 'text-danger'}">
-    ₹${holding.pl_amount.toFixed(2)}
-</td>
-<td class="fw-bold ${holding.pl_percent >= 0 ? 'text-success' : 'text-danger'}">
-    ${holding.pl_percent.toFixed(2)}%
-</td>
-<td class="fw-bold ${holding.overall_pl_amount >= 0 ? 'text-success' : 'text-danger'}">
-    ₹${holding.overall_pl_amount.toFixed(2)}
-</td>
-<td class="fw-bold ${holding.overall_pl_percent >= 0 ? 'text-success' : 'text-danger'}">
-    ${holding.overall_pl_percent.toFixed(2)}%
-</td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="input-group" style="max-width: 120px;">
-                                <button class="btn btn-sm btn-outline-secondary quantity-down" 
-                                        type="button">−</button>
-                                <input type="number" 
-                                       class="form-control text-center quantity-input" 
-                                       value="1" 
-                                       min="1" 
-                                       style="padding: 0.25rem;">
-                                <button class="btn btn-sm btn-outline-secondary quantity-up" 
-                                        type="button">+</button>
-                            </div>
-                            <button class="btn btn-sm btn-success buy-more" 
+        .then(dontSellData => {
+            const dontSellSymbols = dontSellData.symbols || [];
+            
+            // Then fetch the holdings data
+            fetch('/api/holdings')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('holdings-body');
+                    tbody.innerHTML = data.holdings.map(holding => `
+                        <tr>
+                            <td>
+                                <input type="checkbox" 
+                                    class="dont-sell-checkbox"
                                     data-symbol="${holding.symbol}"
-                                    data-price="${holding.current_price}">
-                                Buy
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+                                    ${dontSellSymbols.includes(holding.symbol) ? 'checked' : ''}>
+                            </td>
+                            <td>
+                                <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.symbol}" 
+                                target="_blank" 
+                                class="stock-badge">
+                                    ${holding.symbol}
+                                </a>
+                            </td>
+                            <td class="fw-bold">${holding.quantity}</td>
+                            <td class="fw-bold price-cell">₹${holding.invested.toFixed(2)}</td>
+                            <td class="fw-bold ${holding.pl_amount >= 0 ? 'text-success' : 'text-danger'}">
+                                ₹${holding.pl_amount.toFixed(2)}
+                            </td>
+                            <td class="fw-bold ${holding.pl_percent >= 0 ? 'text-success' : 'text-danger'}">
+                                ${holding.pl_percent.toFixed(2)}%
+                            </td>
+                            <td class="fw-bold ${holding.overall_pl_amount >= 0 ? 'text-success' : 'text-danger'}">
+                                ₹${holding.overall_pl_amount.toFixed(2)}
+                            </td>
+                            <td class="fw-bold ${holding.overall_pl_percent >= 0 ? 'text-success' : 'text-danger'}">
+                                ${holding.overall_pl_percent.toFixed(2)}%
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="input-group" style="max-width: 120px;">
+                                        <button class="btn btn-sm btn-outline-secondary quantity-down" 
+                                                type="button">−</button>
+                                        <input type="number" 
+                                            class="form-control text-center quantity-input" 
+                                            value="1" 
+                                            min="1" 
+                                            style="padding: 0.25rem;">
+                                        <button class="btn btn-sm btn-outline-secondary quantity-up" 
+                                                type="button">+</button>
+                                    </div>
+                                    <button class="btn btn-sm btn-success buy-more" 
+                                            data-symbol="${holding.symbol}"
+                                            data-price="${holding.current_price}">
+                                        Buy
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
 
-            // Add event listeners for quantity controls
-            tbody.querySelectorAll('.quantity-up').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const input = btn.parentElement.querySelector('.quantity-input');
-                    input.value = parseInt(input.value) + 1;
+                    // Add checkbox handlers
+                    tbody.querySelectorAll('.dont-sell-checkbox').forEach(checkbox => {
+                        checkbox.addEventListener('change', (e) => {
+                            const symbol = e.target.dataset.symbol;
+                            const action = e.target.checked ? 'add' : 'remove';
+                            
+                            fetch('/api/dont_sell', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({symbol, action})
+                            }).then(response => {
+                                if (response.ok) {
+                                    showToast(`${symbol} ${action === 'add' ? 'added to' : 'removed from'} don't sell list`, 'success');
+                                }
+                            }).catch(error => {
+                                showToast(`Error updating don't sell status for ${symbol}`, 'error');
+                            });
+                        });
+                    });
+
+                    // Quantity controls
+                    tbody.querySelectorAll('.quantity-up').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const input = btn.parentElement.querySelector('.quantity-input');
+                            input.value = parseInt(input.value) + 1;
+                        });
+                    });
+
+                    tbody.querySelectorAll('.quantity-down').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const input = btn.parentElement.querySelector('.quantity-input');
+                            input.value = Math.max(1, parseInt(input.value) - 1);
+                        });
+                    });
+
+                        tbody.querySelectorAll('.buy-more').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const symbol = btn.dataset.symbol;
+                            const quantity = parseInt(btn.parentElement.querySelector('.quantity-input').value);
+                            const price = parseFloat(btn.dataset.price);
+                            
+                            btn.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div>`;
+                            
+                            fetch('/buy_stocks', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    stocks: [{ symbol: symbol, price: price }],
+                                    quantity: quantity
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.message) {
+                                    showToast(`Successfully bought ${quantity} shares of ${symbol}`, 'success');
+                                    updateHoldingsDisplay();
+                                    updateCashDisplay();
+                                }
+                            })
+                            .catch(error => {
+                                showToast(`Error buying ${symbol}: ${error.message}`, 'error');
+                            })
+                            .finally(() => {
+                                btn.innerHTML = 'Buy';
+                            });
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching holdings:', error));
+        })
+        .catch(error => console.error('Error fetching don\'t sell list:', error));
+}
+                
+                function updateCashDisplay() {
+                    const amountText = cashAmount.querySelector('.amount-text');
+                    const spinner = cashAmount.querySelector('.loading-spinner');
+
+                    // Add loading states
+                    spinner.classList.add('active');
+                    amountText.classList.add('updating');
+
+                    fetch('/api/limits')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.cash) {
+                                amountText.textContent = `₹${parseFloat(data.cash).toFixed(2)}`;
+                            }
+                        })
+                        .catch(() => {
+                            amountText.textContent = '₹–––';
+                        })
+                        .finally(() => {
+                            // Remove loading states
+                            spinner.classList.remove('active');
+                            amountText.classList.remove('updating');
+                        });
+                }
+
+                function updatePurchaseStatus() {
+                    document.querySelectorAll('.stock-select').forEach(checkbox => {
+                        if (purchasedStocks.has(checkbox.dataset.symbol)) {
+                            checkbox.disabled = true;
+                            checkbox.closest('tr').classList.add('disabled');
+                        }
+                    });
+                }
+
+                function updateBuyButton() {
+                    const selected = document.querySelectorAll('.stock-select:checked:not(:disabled)');
+                    buyButton.disabled = selected.length === 0;
+                    buyButton.innerHTML = selected.length > 0 ?
+                        `<i class="fas fa-shopping-cart me-2"></i>Buy ${selected.length} Stock${selected.length !== 1 ? 's' : ''}` :
+                        '<i class="fas fa-shopping-cart me-2"></i>Buy Selected Stocks';
+                }
+
+                document.getElementById('stock-table-body').addEventListener('change', e => {
+                    if (e.target.classList.contains('stock-select')) {
+                        updateBuyButton();
+                    }
                 });
-            });
 
-            tbody.querySelectorAll('.quantity-down').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const input = btn.parentElement.querySelector('.quantity-input');
-                    input.value = Math.max(1, parseInt(input.value) - 1);
-                });
-            });
+                buyButton.addEventListener('click', function () {
+                    const originalButtonHTML = buyButton.innerHTML;
+                    const amount = parseInt(document.getElementById('investment-amount').value) || 5000;
+                    buyButton.innerHTML = `<div class="loading-spinner"></div> Processing...`;
 
-            // Add event listeners for buy buttons
-            tbody.querySelectorAll('.buy-more').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const symbol = btn.dataset.symbol;
-                    const quantity = parseInt(btn.parentElement.querySelector('.quantity-input').value);
-                    const price = parseFloat(btn.dataset.price);
-                    
-                    btn.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div>`;
-                    
+                    const selectedStocks = Array.from(
+                        document.querySelectorAll('.stock-select:checked:not(:disabled)')
+                    ).map(checkbox => ({
+                        name: checkbox.dataset.name,
+                        symbol: checkbox.dataset.symbol,
+                        price: parseFloat(checkbox.dataset.price)
+                    }));
+
                     fetch('/buy_stocks', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            stocks: [{
-                                symbol: symbol,
-                                price: price
-                            }],
-                            quantity: quantity
+                            stocks: selectedStocks,
+                            amount: amount
                         })
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message) {
-                            showToast(`Successfully bought ${quantity} shares of ${symbol}`, 'success');
-                            updateHoldingsDisplay();
-                            updateCashDisplay();
-                        }
-                    })
-                    .catch(error => {
-                        showToast(`Error buying ${symbol}: ${error.message}`, 'error');
-                    })
-                    .finally(() => {
-                        btn.innerHTML = 'Buy';
-                    });
-                });
-            });
-        })
-        .catch(error => console.error('Error fetching holdings:', error));
-}
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message) {
+                                selectedStocks.forEach(stock => purchasedStocks.add(stock.symbol));
+                                localStorage.setItem('purchasedStocks', JSON.stringify([...purchasedStocks]));
 
-            function updateCashDisplay() {
-    const amountText = cashAmount.querySelector('.amount-text');
-    const spinner = cashAmount.querySelector('.loading-spinner');
-    
-    // Add loading states
-    spinner.classList.add('active');
-    amountText.classList.add('updating');
-
-    fetch('/api/limits')
-        .then(response => response.json())
-        .then(data => {
-            if (data.cash) {
-                amountText.textContent = `₹${parseFloat(data.cash).toFixed(2)}`;
-            }
-        })
-        .catch(() => {
-            amountText.textContent = '₹–––';
-        })
-        .finally(() => {
-            // Remove loading states
-            spinner.classList.remove('active');
-            amountText.classList.remove('updating');
-        });
-}
-
-            function updatePurchaseStatus() {
-                document.querySelectorAll('.stock-select').forEach(checkbox => {
-                    if (purchasedStocks.has(checkbox.dataset.symbol)) {
-                        checkbox.disabled = true;
-                        checkbox.closest('tr').classList.add('disabled');
-                    }
-                });
-            }
-
-            function updateBuyButton() {
-                const selected = document.querySelectorAll('.stock-select:checked:not(:disabled)');
-                buyButton.disabled = selected.length === 0;
-                buyButton.innerHTML = selected.length > 0 ?
-                    `<i class="fas fa-shopping-cart me-2"></i>Buy ${selected.length} Stock${selected.length !== 1 ? 's' : ''}` :
-                    '<i class="fas fa-shopping-cart me-2"></i>Buy Selected Stocks';
-            }
-
-            document.getElementById('stock-table-body').addEventListener('change', e => {
-                if (e.target.classList.contains('stock-select')) {
-                    updateBuyButton();
-                }
-            });
-
-            buyButton.addEventListener('click', function() {
-                const originalButtonHTML = buyButton.innerHTML;
-                const amount = parseInt(document.getElementById('investment-amount').value) || 5000;
-                buyButton.innerHTML = `<div class="loading-spinner"></div> Processing...`;
-                
-                const selectedStocks = Array.from(
-                    document.querySelectorAll('.stock-select:checked:not(:disabled)')
-                ).map(checkbox => ({
-                    name: checkbox.dataset.name,
-                    symbol: checkbox.dataset.symbol,
-                    price: parseFloat(checkbox.dataset.price)
-                }));
-
-                fetch('/buy_stocks', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        stocks: selectedStocks,
-                        amount: amount
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        selectedStocks.forEach(stock => purchasedStocks.add(stock.symbol));
-                        localStorage.setItem('purchasedStocks', JSON.stringify([...purchasedStocks]));
-                        
-                        const notification = createNotification(
-                            'success',
-                            `<i class="fas fa-check-circle me-2"></i>
+                                const notification = createNotification(
+                                    'success',
+                                    `<i class="fas fa-check-circle me-2"></i>
                             ${data.message}<br>
                             <div class="mt-2">
                                 ${selectedStocks.map(stock => `
@@ -858,79 +918,79 @@ tfoot tr {
                                     </span>
                                 `).join('')}
                             </div>`
-                        );
+                                );
 
-                        document.querySelectorAll('.stock-select:checked').forEach(checkbox => {
-                            checkbox.checked = false;
-                            checkbox.disabled = true;
-                            checkbox.closest('tr').classList.add('disabled');
-                        });
+                                document.querySelectorAll('.stock-select:checked').forEach(checkbox => {
+                                    checkbox.checked = false;
+                                    checkbox.disabled = true;
+                                    checkbox.closest('tr').classList.add('disabled');
+                                });
 
-                        updateBuyButton();
-                        updateCashDisplay();
-                        updatepositionsDisplay();
-                    }
-                })
-                .catch(error => {
-                    createNotification(
-                        'error',
-                        `<i class="fas fa-times-circle me-2"></i>
+                                updateBuyButton();
+                                updateCashDisplay();
+                                updatepositionsDisplay();
+                            }
+                        })
+                        .catch(error => {
+                            createNotification(
+                                'error',
+                                `<i class="fas fa-times-circle me-2"></i>
                         Error: ${error.message}`
-                    );
-                })
-                .finally(() => {
-                    buyButton.innerHTML = originalButtonHTML;
+                            );
+                        })
+                        .finally(() => {
+                            buyButton.innerHTML = originalButtonHTML;
+                        });
                 });
-            });
 
-            function createNotification(type, content) {
-                const notification = document.createElement('div');
-                notification.className = `order-result ${type} fade-in`;
-                notification.innerHTML = `
+                function createNotification(type, content) {
+                    const notification = document.createElement('div');
+                    notification.className = `order-result ${type} fade-in`;
+                    notification.innerHTML = `
                     <button class="notification-close">&times;</button>
                     ${content}
                 `;
-                notification.querySelector('.notification-close').addEventListener('click', () => notification.remove());
-                document.getElementById('notifications-container').appendChild(notification);
-                setTimeout(() => notification.remove(), 5000);
-                return notification;
-            }
+                    notification.querySelector('.notification-close').addEventListener('click', () => notification.remove());
+                    document.getElementById('notifications-container').appendChild(notification);
+                    setTimeout(() => notification.remove(), 5000);
+                    return notification;
+                }
 
-            function showToast(message, type = 'success') {
-                const notification = createNotification(
-                    type,
-                    `<i class="fas fa-${type === 'success' ? 'check' : 'times'}-circle me-2"></i>
+                function showToast(message, type = 'success') {
+                    const notification = createNotification(
+                        type,
+                        `<i class="fas fa-${type === 'success' ? 'check' : 'times'}-circle me-2"></i>
                     ${message}`
-                );
-            }
+                    );
+                }
 
-            document.getElementById('refresh-stocks').addEventListener('click', function() {
-            const btn = this;
-            btn.classList.add('refreshing');
-            
-            fetchStocks().finally(() => {
-                btn.classList.remove('refreshing');
-            });
-        }); 
+                document.getElementById('refresh-stocks').addEventListener('click', function () {
+                    const btn = this;
+                    btn.classList.add('refreshing');
 
-            // Initial setup
-            updateCashDisplay();
-            updatePurchaseStatus();
-            updateBuyButton();
-            updatepositionsDisplay();
-            updateHoldingsDisplay();
+                    fetchStocks().finally(() => {
+                        btn.classList.remove('refreshing');
+                    });
+                });
 
-            setInterval(updateCashDisplay, 5000);
-            setInterval(updatepositionsDisplay, 5000); 
-            setInterval(fetchStocks, 600000);
-            setInterval(updateHoldingsDisplay, 5000);
-            
-            function fetchStocks() {
-    return fetch('/api/stocks')  // Added return statement
-        .then(response => response.json())
-        .then(stocks => {
-            const tbody = document.getElementById('stock-table-body');
-            tbody.innerHTML = stocks.map(stock => `
+                // Initial setup
+                updateCashDisplay();
+                updatePurchaseStatus();
+                updateBuyButton();
+                updatepositionsDisplay();
+                updateHoldingsDisplay();
+
+                setInterval(updateCashDisplay, 5000);
+                setInterval(updatepositionsDisplay, 5000);
+                setInterval(fetchStocks, 600000);
+                setInterval(updateHoldingsDisplay, 5000);
+
+                function fetchStocks() {
+                    return fetch('/api/stocks')
+                        .then(response => response.json())
+                        .then(stocks => {
+                            const tbody = document.getElementById('stock-table-body');
+                            tbody.innerHTML = stocks.map(stock => `
                 <tr class="stock-row ${purchasedStocks.has(stock.symbol) ? 'disabled' : ''}" data-symbol="${stock.symbol}">
                     <td>
                         <input type="checkbox" 
@@ -955,18 +1015,18 @@ tfoot tr {
                 </tr>
             `).join('');
 
-            updatePurchaseStatus();
-            updateBuyButton();
-        })
-        .catch(console.error);
-}
+                            updatePurchaseStatus();
+                            updateBuyButton();
+                        })
+                        .catch(console.error);
+                }
 
-            function updatepositionsDisplay() {
-                fetch('/api/positions')
-                    .then(response => response.json())
-                    .then(data => {
-            const tbody = document.querySelector('.positions-table tbody');
-            tbody.innerHTML = data.positions.map(position => `
+                function updatepositionsDisplay() {
+                    fetch('/api/positions')
+                        .then(response => response.json())
+                        .then(data => {
+                            const tbody = document.querySelector('.positions-table tbody');
+                            tbody.innerHTML = data.positions.map(position => `
                 <tr class="stock-row ${position.daybuyqty > 0 ? 'tr-buy' : (position.daysellqty > 0 ? 'tr-sell' : '')}">
                     <td>
                         <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${position.tsym.split('-')[0]}" 
@@ -984,9 +1044,9 @@ tfoot tr {
                 </tr>
             `).join('');
 
-                // Update footer
-                const footer = document.querySelector('.positions-table tfoot tr');
-                footer.innerHTML = `
+                            // Update footer
+                            const footer = document.querySelector('.positions-table tfoot tr');
+                            footer.innerHTML = `
                     <td class="fw-bold">Totals</td>
                     <td class="fw-bold">${data.positions.reduce((sum, h) => sum + h.quantity, 0)}</td>
                     <td></td>
@@ -995,13 +1055,23 @@ tfoot tr {
                         ₹${data.total_unrealized.toFixed(2)}
                     </td>
                 `;
-            })
-            .catch(error => console.error('Error fetching positions:', error));
-    }
-            
-        });
+                        })
+                        .catch(error => console.error('Error fetching positions:', error));
+                }
 
-    </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"908e745b0fe2e183","version":"2025.1.0","r":1,"token":"79c53ece347a4075a77208d2660a9019","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}' crossorigin="anonymous"></script>
+            });
+
+        </script>
+        <script defer
+            src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+            integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
+            data-cf-beacon='{"rayId":"908e745b0fe2e183","version":"2025.1.0","r":1,"token":"79c53ece347a4075a77208d2660a9019","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}'
+            crossorigin="anonymous"></script>
+        <script defer
+            src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+            integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
+            data-cf-beacon='{"rayId":"90a68b5a992d0786","version":"2025.1.0","r":1,"token":"79c53ece347a4075a77208d2660a9019","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}'
+            crossorigin="anonymous"></script>
 </body>
+
 </html>

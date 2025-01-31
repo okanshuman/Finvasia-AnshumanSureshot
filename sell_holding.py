@@ -1,21 +1,17 @@
+# sell_holding
 from order_management import *
+from app import load_dont_sell_list
 
 # Initialize a set to keep track of sold trading symbols
 sold_symbols = set()
 
 def sell_holding(api):
+    dont_sell_symbols = load_dont_sell_list()
     holdings_response = api.get_holdings()
     
-    #print("Fetching holdings...")
-    
-    # Check if holdings_response is None or empty
     if holdings_response is None or not isinstance(holdings_response, list):
-        #print("No valid holdings response received.")
         return
-    
-    #print(f"Number of holdings found: {len(holdings_response)}")
-    
-    # Extracting the exchange trading symbols and quantities
+
     for holding in holdings_response:
         try:
             if holding['stat'] == 'Ok':
@@ -32,14 +28,17 @@ def sell_holding(api):
                 # Extract trading symbol
                 tradingsymbol = None
                 for tsym_info in holding.get('exch_tsym', []):
-                    if tsym_info['exch'] == 'NSE':  # Check if the exchange is NSE
-                        tradingsymbol = tsym_info['tsym']  # Get the trading symbol for NSE
+                    if tsym_info['exch'] == 'NSE':
+                        tradingsymbol = tsym_info['tsym']
                         break
-                
+
                 if not tradingsymbol:
-                    print("No NSE trading symbol found in holding.")
                     continue
                 
+                if tradingsymbol in dont_sell_symbols:
+                    print(f"Skipping {tradingsymbol} (marked as don't sell)")
+                    continue
+
                 # Skip if this symbol has already been sold
                 if tradingsymbol in sold_symbols:
                     #print(f"{tradingsymbol} has already been sold. Skipping.")

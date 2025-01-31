@@ -1,11 +1,14 @@
+# app.py
 from flask import Flask, render_template, jsonify, request
 from flask_apscheduler import APScheduler
 import logging
 from fetch_and_buy_stock import fetch_stocks
 from order_management import *
 import credentials as cr
-from sell_holding import *
+import sell_holding
 from datetime import datetime, time
+import json
+import os
 
 app = Flask(__name__)
 
@@ -21,6 +24,42 @@ api.login(userid=cr.user, password=cr.pwd, twoFA=cr.factor2,
 stock_data = []
 positions_symbols = set()
 purchased_stocks = set()
+
+DONT_SELL_FILE = os.path.join(os.path.dirname(__file__), 'dont_sell.json')
+
+def load_dont_sell_list():
+    if not os.path.exists(DONT_SELL_FILE):
+        return []
+    try:
+        with open(DONT_SELL_FILE, 'r') as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        print(f"Warning: Could not decode JSON from {DONT_SELL_FILE}. Returning empty list.")
+        return []
+
+def save_dont_sell_list(symbols):
+    with open(DONT_SELL_FILE, 'w') as f:
+        json.dump(symbols, f)
+
+@app.route('/api/dont_sell', methods=['POST'])
+def toggle_dont_sell():
+    data = request.json
+    symbol = data.get('symbol')
+    action = data.get('action')  # 'add' or 'remove'
+    
+    dont_sell = load_dont_sell_list()
+    
+    if action == 'add' and symbol not in dont_sell:
+        dont_sell.append(symbol)
+    elif action == 'remove' and symbol in dont_sell:
+        dont_sell.remove(symbol)
+        
+    save_dont_sell_list(dont_sell)
+    return jsonify({'status': 'success'})
+
+@app.route('/api/dont_sell')
+def get_dont_sell():
+    return jsonify({'symbols': load_dont_sell_list()})
 
 def process_positions():
     position_response_app = api.get_positions()
@@ -209,7 +248,7 @@ def should_run_sell_holding():
 @scheduler.task('interval', id='sell_holding_job', seconds=15)
 def scheduled_sell_holding():
     if should_run_sell_holding():
-        sell_holding(api)
+        sell_holding.sell_holding(api)
     else:
         print("Market is closed. sell_holding will not run.")
 
