@@ -172,4 +172,4 @@ cython_debug/
 credentials.py
 .DS_Store
 ._*
-.json
+*.json
