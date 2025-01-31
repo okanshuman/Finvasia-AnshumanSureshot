@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,8 +17,8 @@
             --danger: #ef4444;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
+        body {
+            font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
         }
 
@@ -26,16 +27,33 @@
             border-radius: 1rem;
             padding: 1.5rem;
             transition: transform 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        .profit-positive { color: var(--success); }
-        .profit-negative { color: var(--danger); }
-        .distribution-chart { height: 220px; }
-        .metric-small { font-size: 0.9em; }
-        .bg-success-soft { background: rgba(34, 197, 94, 0.1); }
-        .bg-warning-soft { background: rgba(245, 158, 11, 0.1); }
-        
+        .profit-positive {
+            color: var(--success);
+        }
+
+        .profit-negative {
+            color: var(--danger);
+        }
+
+        .distribution-chart {
+            height: 220px;
+        }
+
+        .metric-small {
+            font-size: 0.9em;
+        }
+
+        .bg-success-soft {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .bg-warning-soft {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
         .most-traded-card {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
             color: white;
@@ -72,6 +90,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container-xl py-4">
         <div class="d-flex flex-column flex-lg-row justify-content-between gap-4 mb-4">
@@ -108,6 +127,20 @@
                     <div class="text-secondary mb-1">Net Profit</div>
                     <div class="h3 mb-0" id="net-profit">-</div>
                     <div class="metric-small text-secondary mt-1">After transaction charges</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-2">
+                <div class="stat-card">
+                    <div class="text-secondary mb-1">Win Rate</div>
+                    <div class="h3 mb-0" id="win-rate">-</div>
+                    <div class="text-muted small mt-1">Closed trades</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-2">
+                <div class="stat-card">
+                    <div class="text-secondary mb-1">ROI</div>
+                    <div class="h3 mb-0" id="roi">-</div>
+                    <div class="text-muted small mt-1">Return on Investment</div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xl-3">
@@ -149,7 +182,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Initialize distribution chart
             const distCtx = document.getElementById('distributionChart').getContext('2d');
             const distributionChart = new Chart(distCtx, {
@@ -173,7 +206,7 @@
 
             // Filter functionality
             document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     filterTable(this.dataset.status);
@@ -181,46 +214,66 @@
             });
 
             async function loadData() {
-    try {
-        const response = await fetch('/api/trade_history');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-                    
+                try {
+                    const response = await fetch('/api/trade_history');
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+
                     // Calculate metrics
                     const closedTrades = data.filter(t => t.sell_price);
                     const transactionCharges = closedTrades.length * 12;
-                    const realizedPNL = closedTrades.reduce((acc, trade) => 
+                    const realizedPNL = closedTrades.reduce((acc, trade) =>
                         acc + ((trade.sell_price - trade.buy_price_avg) * trade.total_quantity), 0);
                     const netProfit = realizedPNL - transactionCharges;
 
-                    const totalInvestment = data.reduce((acc, trade) => 
-                    acc + (trade.total_quantity * trade.buy_price_avg), 0);
+                    const totalInvestment = data.reduce((acc, trade) =>
+                        acc + (trade.total_quantity * trade.buy_price_avg), 0);
+
+                    // Calculate Win Rate
+                    const winningTrades = closedTrades.filter(trade =>
+                        (trade.sell_price - trade.buy_price_avg) * trade.total_quantity > 0
+                    ).length;
+                    const winRate = closedTrades.length > 0 ? (winningTrades / closedTrades.length) * 100 : 0;
+
+                    // Calculate ROI
+                    const roi = totalInvestment !== 0 ? (netProfit / totalInvestment) * 100 : 0;
+
+                    // Update DOM
+                    document.getElementById('win-rate').innerHTML =
+                        `<span class="${winRate >= 50 ? 'profit-positive' : 'profit-negative'}">
+        ${winRate.toFixed(1)}%
+    </span>`;
+
+                    document.getElementById('roi').innerHTML =
+                        `<span class="${roi >= 0 ? 'profit-positive' : 'profit-negative'}">
+        ${roi.toFixed(1)}%
+    </span>`;
 
                     document.getElementById('total-investment').textContent = `₹${totalInvestment.toFixed(2)}`;
-                    document.getElementById('realized-pnl').innerHTML = 
+                    document.getElementById('realized-pnl').innerHTML =
                         `<span class="${realizedPNL >= 0 ? 'profit-positive' : 'profit-negative'}">
                             ₹${realizedPNL.toFixed(2)}
                         </span>`;
-                        
-                    document.getElementById('transaction-charges').textContent = 
+
+                    document.getElementById('transaction-charges').textContent =
                         `Charges: ₹${transactionCharges.toFixed(2)}`;
-                        
-                    document.getElementById('net-profit').innerHTML = 
+
+                    document.getElementById('net-profit').innerHTML =
                         `<span class="${netProfit >= 0 ? 'profit-positive' : 'profit-negative'}">
                             ₹${netProfit.toFixed(2)}
                         </span>`;
-                    
+
                     // Populate table
                     const tbody = document.getElementById('trade-history-body');
                     tbody.innerHTML = data.map(trade => {
                         const invested = trade.total_quantity * trade.buy_price_avg;
-                        const currentValue = trade.sell_price ? 
-                            trade.total_quantity * trade.sell_price : 
+                        const currentValue = trade.sell_price ?
+                            trade.total_quantity * trade.sell_price :
                             null;
                         const pnl = currentValue ? currentValue - invested : null;
-                        const duration = trade.sell_date ? 
-                            Math.ceil((new Date(trade.sell_date) - new Date(trade.buy_date)) / 
-                            (1000 * 3600 * 24)) : 
+                        const duration = trade.sell_date ?
+                            Math.ceil((new Date(trade.sell_date) - new Date(trade.buy_date)) /
+                                (1000 * 3600 * 24)) :
                             'Active';
 
                         return `
@@ -265,4 +318,5 @@
         });
     </script>
 </body>
+
 </html>
