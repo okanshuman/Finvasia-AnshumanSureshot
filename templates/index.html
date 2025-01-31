@@ -653,8 +653,6 @@
                             <th>Symbol</th>
                             <th>Quantity</th>
                             <th>Invested</th>
-                            <th>Daily P/L Amount</th>
-                            <th>Daily P/L%</th>
                             <th>Overall P/L Amount</th>
                             <th>Overall P/L%</th>
                             <th>Buy More</th>
@@ -696,142 +694,136 @@
                 });
 
                 function updateHoldingsDisplay() {
-    // First fetch the don't sell list
-    fetch('/api/dont_sell')
-        .then(response => response.json())
-        .then(dontSellData => {
-            const dontSellSymbols = dontSellData.symbols || [];
-            
-            // Then fetch the holdings data
-            fetch('/api/holdings')
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('holdings-body');
-                    tbody.innerHTML = data.holdings.map(holding => `
+                    // First fetch the don't sell list
+                    fetch('/api/dont_sell')
+                        .then(response => response.json())
+                        .then(dontSellData => {
+                            const dontSellSymbols = dontSellData.symbols || [];
+
+                            // Then fetch the holdings data
+                            fetch('/api/holdings')
+                                .then(response => response.json())
+                                .then(data => {
+                                    const tbody = document.getElementById('holdings-body');
+                                    tbody.innerHTML = data.holdings.map(holding => `
                         <tr>
-                            <td>
-                                <input type="checkbox" 
-                                    class="dont-sell-checkbox"
-                                    data-symbol="${holding.symbol}"
-                                    ${dontSellSymbols.includes(holding.symbol) ? 'checked' : ''}>
-                            </td>
-                            <td>
-                                <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.symbol}" 
-                                target="_blank" 
-                                class="stock-badge">
-                                    ${holding.symbol}
-                                </a>
-                            </td>
-                            <td class="fw-bold">${holding.quantity}</td>
-                            <td class="fw-bold price-cell">₹${holding.invested.toFixed(2)}</td>
-                            <td class="fw-bold ${holding.pl_amount >= 0 ? 'text-success' : 'text-danger'}">
-                                ₹${holding.pl_amount.toFixed(2)}
-                            </td>
-                            <td class="fw-bold ${holding.pl_percent >= 0 ? 'text-success' : 'text-danger'}">
-                                ${holding.pl_percent.toFixed(2)}%
-                            </td>
-                            <td class="fw-bold ${holding.overall_pl_amount >= 0 ? 'text-success' : 'text-danger'}">
-                                ₹${holding.overall_pl_amount.toFixed(2)}
-                            </td>
-                            <td class="fw-bold ${holding.overall_pl_percent >= 0 ? 'text-success' : 'text-danger'}">
-                                ${holding.overall_pl_percent.toFixed(2)}%
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="input-group" style="max-width: 120px;">
-                                        <button class="btn btn-sm btn-outline-secondary quantity-down" 
-                                                type="button">−</button>
-                                        <input type="number" 
-                                            class="form-control text-center quantity-input" 
-                                            value="1" 
-                                            min="1" 
-                                            style="padding: 0.25rem;">
-                                        <button class="btn btn-sm btn-outline-secondary quantity-up" 
-                                                type="button">+</button>
-                                    </div>
-                                    <button class="btn btn-sm btn-success buy-more" 
-                                            data-symbol="${holding.symbol}"
-                                            data-price="${holding.current_price}">
-                                        Buy
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+    <td>
+        <input type="checkbox" 
+            class="dont-sell-checkbox"
+            data-symbol="${holding.symbol}"
+            ${dontSellSymbols.includes(holding.symbol) ? 'checked' : ''}>
+    </td>
+    <td>
+        <a href="https://www.tradingview.com/chart/?symbol=NSE%3A${holding.symbol}" 
+        target="_blank" 
+        class="stock-badge">
+            ${holding.symbol}
+        </a>
+    </td>
+    <td class="fw-bold">${holding.quantity}</td>
+    <td class="fw-bold price-cell">₹${holding.invested.toFixed(2)}</td>
+    <td class="fw-bold ${holding.overall_pl_amount >= 0 ? 'text-success' : 'text-danger'}">
+        ₹${holding.overall_pl_amount.toFixed(2)}
+    </td>
+    <td class="fw-bold ${holding.overall_pl_percent >= 0 ? 'text-success' : 'text-danger'}">
+        ${holding.overall_pl_percent.toFixed(2)}%
+    </td>
+    <td>
+        <div class="d-flex align-items-center gap-2">
+            <div class="input-group" style="max-width: 120px;">
+                <button class="btn btn-sm btn-outline-secondary quantity-down" 
+                        type="button">−</button>
+                <input type="number" 
+                    class="form-control text-center quantity-input" 
+                    value="1" 
+                    min="1" 
+                    style="padding: 0.25rem;">
+                <button class="btn btn-sm btn-outline-secondary quantity-up" 
+                        type="button">+</button>
+            </div>
+            <button class="btn btn-sm btn-success buy-more" 
+                    data-symbol="${holding.symbol}"
+                    data-price="${holding.current_price}">
+                Buy
+            </button>
+        </div>
+    </td>
+</tr>
                     `).join('');
 
-                    // Add checkbox handlers
-                    tbody.querySelectorAll('.dont-sell-checkbox').forEach(checkbox => {
-                        checkbox.addEventListener('change', (e) => {
-                            const symbol = e.target.dataset.symbol;
-                            const action = e.target.checked ? 'add' : 'remove';
-                            
-                            fetch('/api/dont_sell', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({symbol, action})
-                            }).then(response => {
-                                if (response.ok) {
-                                    showToast(`${symbol} ${action === 'add' ? 'added to' : 'removed from'} don't sell list`, 'success');
-                                }
-                            }).catch(error => {
-                                showToast(`Error updating don't sell status for ${symbol}`, 'error');
-                            });
-                        });
-                    });
+                                    // Add checkbox handlers
+                                    tbody.querySelectorAll('.dont-sell-checkbox').forEach(checkbox => {
+                                        checkbox.addEventListener('change', (e) => {
+                                            const symbol = e.target.dataset.symbol;
+                                            const action = e.target.checked ? 'add' : 'remove';
 
-                    // Quantity controls
-                    tbody.querySelectorAll('.quantity-up').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const input = btn.parentElement.querySelector('.quantity-input');
-                            input.value = parseInt(input.value) + 1;
-                        });
-                    });
+                                            fetch('/api/dont_sell', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ symbol, action })
+                                            }).then(response => {
+                                                if (response.ok) {
+                                                    showToast(`${symbol} ${action === 'add' ? 'added to' : 'removed from'} don't sell list`, 'success');
+                                                }
+                                            }).catch(error => {
+                                                showToast(`Error updating don't sell status for ${symbol}`, 'error');
+                                            });
+                                        });
+                                    });
 
-                    tbody.querySelectorAll('.quantity-down').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const input = btn.parentElement.querySelector('.quantity-input');
-                            input.value = Math.max(1, parseInt(input.value) - 1);
-                        });
-                    });
+                                    // Quantity controls
+                                    tbody.querySelectorAll('.quantity-up').forEach(btn => {
+                                        btn.addEventListener('click', () => {
+                                            const input = btn.parentElement.querySelector('.quantity-input');
+                                            input.value = parseInt(input.value) + 1;
+                                        });
+                                    });
 
-                        tbody.querySelectorAll('.buy-more').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const symbol = btn.dataset.symbol;
-                            const quantity = parseInt(btn.parentElement.querySelector('.quantity-input').value);
-                            const price = parseFloat(btn.dataset.price);
-                            
-                            btn.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div>`;
-                            
-                            fetch('/buy_stocks', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    stocks: [{ symbol: symbol, price: price }],
-                                    quantity: quantity
+                                    tbody.querySelectorAll('.quantity-down').forEach(btn => {
+                                        btn.addEventListener('click', () => {
+                                            const input = btn.parentElement.querySelector('.quantity-input');
+                                            input.value = Math.max(1, parseInt(input.value) - 1);
+                                        });
+                                    });
+
+                                    tbody.querySelectorAll('.buy-more').forEach(btn => {
+                                        btn.addEventListener('click', () => {
+                                            const symbol = btn.dataset.symbol;
+                                            const quantity = parseInt(btn.parentElement.querySelector('.quantity-input').value);
+                                            const price = parseFloat(btn.dataset.price);
+
+                                            btn.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div>`;
+
+                                            fetch('/buy_stocks', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({
+                                                    stocks: [{ symbol: symbol, price: price }],
+                                                    quantity: quantity
+                                                })
+                                            })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (data.message) {
+                                                        showToast(`Successfully bought ${quantity} shares of ${symbol}`, 'success');
+                                                        updateHoldingsDisplay();
+                                                        updateCashDisplay();
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    showToast(`Error buying ${symbol}: ${error.message}`, 'error');
+                                                })
+                                                .finally(() => {
+                                                    btn.innerHTML = 'Buy';
+                                                });
+                                        });
+                                    });
                                 })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.message) {
-                                    showToast(`Successfully bought ${quantity} shares of ${symbol}`, 'success');
-                                    updateHoldingsDisplay();
-                                    updateCashDisplay();
-                                }
-                            })
-                            .catch(error => {
-                                showToast(`Error buying ${symbol}: ${error.message}`, 'error');
-                            })
-                            .finally(() => {
-                                btn.innerHTML = 'Buy';
-                            });
-                        });
-                    });
-                })
-                .catch(error => console.error('Error fetching holdings:', error));
-        })
-        .catch(error => console.error('Error fetching don\'t sell list:', error));
-}
-                
+                                .catch(error => console.error('Error fetching holdings:', error));
+                        })
+                        .catch(error => console.error('Error fetching don\'t sell list:', error));
+                }
+
                 function updateCashDisplay() {
                     const amountText = cashAmount.querySelector('.amount-text');
                     const spinner = cashAmount.querySelector('.loading-spinner');
@@ -1071,6 +1063,11 @@
             src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
             integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
             data-cf-beacon='{"rayId":"90a68b5a992d0786","version":"2025.1.0","r":1,"token":"79c53ece347a4075a77208d2660a9019","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}'
+            crossorigin="anonymous"></script>
+        <script defer
+            src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
+            integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
+            data-cf-beacon='{"rayId":"90a853934ecb0d86","version":"2025.1.0","r":1,"token":"79c53ece347a4075a77208d2660a9019","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}'
             crossorigin="anonymous"></script>
 </body>
 

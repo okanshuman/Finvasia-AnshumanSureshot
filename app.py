@@ -181,6 +181,7 @@ def buy_stocks():
 def get_holdings():
     try:
         holdings_response = api.get_holdings()
+        #print(holdings_response)
         holdings = []
         
         if holdings_response is None or not isinstance(holdings_response, list):
