@@ -38,10 +38,6 @@
             color: var(--danger);
         }
 
-        .distribution-chart {
-            height: 220px;
-        }
-
         .metric-small {
             font-size: 0.9em;
         }
@@ -143,16 +139,6 @@
                     <div class="text-muted small mt-1">Return on Investment</div>
                 </div>
             </div>
-            <div class="col-12 col-md-6 col-xl-3">
-                <div class="stat-card">
-                    <div class="text-center">
-                        <div class="text-secondary mb-3">Position Distribution</div>
-                        <div class="distribution-chart">
-                            <canvas id="distributionChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="card shadow-sm border-0 overflow-hidden">
@@ -183,27 +169,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize distribution chart
-            const distCtx = document.getElementById('distributionChart').getContext('2d');
-            const distributionChart = new Chart(distCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Open Positions', 'Closed Positions'],
-                    datasets: [{
-                        data: [3, 1],
-                        backgroundColor: ['var(--warning)', 'var(--success)'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    cutout: '75%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    }
-                }
-            });
-
             // Filter functionality
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
