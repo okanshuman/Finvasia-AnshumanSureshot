@@ -205,10 +205,8 @@ def get_holdings():
                     
                     # Get current price
                     current_price = getCurrentPriceBySymbolName(api, tradingsymbol)
-                    print(current_price)
                     current_price = float(current_price) if current_price else avg_price
-                    print(current_price)
-                    
+                                       
                     # Calculate P/L percentages and amounts
                     pl_percent = ((current_price - avg_price) / avg_price * 100) if avg_price else 0
                     invested = avg_price * qty
