@@ -4,46 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade History - Finvasia</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .table thead th { background-color: #6366f1; color: white; }
-        .container-xl { max-width: 1400px; margin-top: 2rem; }
-        .status-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
-        .open { background-color: #e9ecef; color: #495057; }
-        .closed { background-color: #d1e7dd; color: #0f5132; }
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .profit-positive { color: var(--success); }
+        .profit-negative { color: var(--danger); }
+        .distribution-chart { height: 220px; }
+        .metric-small { font-size: 0.9em; }
+        .bg-success-soft { background: rgba(34, 197, 94, 0.1); }
+        .bg-warning-soft { background: rgba(245, 158, 11, 0.1); }
+        
+        .most-traded-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+        }
+
+        .table-hover tbody tr {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 0.75rem;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            width: 100px;
+        }
+
+        .symbol-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
-    <div class="container-xl">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Trade History</h1>
-            <a href="/" class="btn btn-primary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    <div class="container-xl py-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-4 mb-4">
+            <div>
+                <h1 class="h3 mb-2 fw-bold text-gray-800">Trade History</h1>
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="filter-btn btn btn-outline-primary btn-sm active" data-status="all">All</div>
+                    <div class="filter-btn btn btn-outline-primary btn-sm" data-status="open">Open</div>
+                    <div class="filter-btn btn btn-outline-primary btn-sm" data-status="closed">Closed</div>
+                </div>
+            </div>
+            <a href="/" class="btn btn-primary h-fit">
+                <i class="mdi mdi-arrow-left"></i> Back to Dashboard
             </a>
         </div>
-        
-        <div class="card shadow-sm">
+
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="text-secondary mb-1">Total Investment</div>
+                    <div class="h3 mb-0" id="total-investment">-</div>
+                    <div class="text-muted small mt-1">Across all positions</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="text-secondary mb-1">Realized P&L</div>
+                    <div class="h3 mb-0" id="realized-pnl">-</div>
+                    <div class="metric-small text-secondary mt-1" id="transaction-charges"></div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="text-secondary mb-1">Net Profit</div>
+                    <div class="h3 mb-0" id="net-profit">-</div>
+                    <div class="metric-small text-secondary mt-1">After transaction charges</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="text-center">
+                        <div class="text-secondary mb-3">Position Distribution</div>
+                        <div class="distribution-chart">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 overflow-hidden">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-primary-50">
                             <tr>
-                                <th>Symbol</th>
-                                <th>Name</th>
-                                <th>Quantity</th>
-                                <th>Buy Price</th>
-                                <th>Buy Date</th>
-                                <th>Sell Price</th>
-                                <th>Sell Date</th>
-                                <th>Status</th>
+                                <th class="ps-4">Symbol</th>
+                                <th>Position Size</th>
+                                <th>Invested</th>
+                                <th>Current Value</th>
+                                <th>P&L</th>
+                                <th>Duration</th>
+                                <th class="pe-4">Status</th>
                             </tr>
                         </thead>
                         <tbody id="trade-history-body">
-                            <tr>
-                                <td colspan="8" class="text-center py-5">Loading trade history...</td>
-                            </tr>
+                            <!-- Data will be populated here -->
                         </tbody>
                     </table>
                 </div>
@@ -51,39 +146,122 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('/api/trade_history')
-                .then(response => response.json())
-                .then(data => {
+            // Initialize distribution chart
+            const distCtx = document.getElementById('distributionChart').getContext('2d');
+            const distributionChart = new Chart(distCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Open Positions', 'Closed Positions'],
+                    datasets: [{
+                        data: [3, 1],
+                        backgroundColor: ['var(--warning)', 'var(--success)'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+
+            // Filter functionality
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    filterTable(this.dataset.status);
+                });
+            });
+
+            async function loadData() {
+    try {
+        const response = await fetch('/api/trade_history');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+                    
+                    // Calculate metrics
+                    const closedTrades = data.filter(t => t.sell_price);
+                    const transactionCharges = closedTrades.length * 12;
+                    const realizedPNL = closedTrades.reduce((acc, trade) => 
+                        acc + ((trade.sell_price - trade.buy_price_avg) * trade.total_quantity), 0);
+                    const netProfit = realizedPNL - transactionCharges;
+
+                    const totalInvestment = data.reduce((acc, trade) => 
+                    acc + (trade.total_quantity * trade.buy_price_avg), 0);
+
+                    document.getElementById('total-investment').textContent = `₹${totalInvestment.toFixed(2)}`;
+                    document.getElementById('realized-pnl').innerHTML = 
+                        `<span class="${realizedPNL >= 0 ? 'profit-positive' : 'profit-negative'}">
+                            ₹${realizedPNL.toFixed(2)}
+                        </span>`;
+                        
+                    document.getElementById('transaction-charges').textContent = 
+                        `Charges: ₹${transactionCharges.toFixed(2)}`;
+                        
+                    document.getElementById('net-profit').innerHTML = 
+                        `<span class="${netProfit >= 0 ? 'profit-positive' : 'profit-negative'}">
+                            ₹${netProfit.toFixed(2)}
+                        </span>`;
+                    
+                    // Populate table
                     const tbody = document.getElementById('trade-history-body');
-                    tbody.innerHTML = data.map(trade => `
-                        <tr>
-                            <td class="fw-bold">${trade.symbol}</td>
-                            <td>${trade.name}</td>
-                            <td>${trade.total_quantity}</td>
-                            <td>₹${trade.buy_price_avg.toFixed(2)}</td>
-                            <td>${new Date(trade.buy_date).toLocaleString()}</td>
-                            <td>${trade.sell_price ? '₹' + trade.sell_price.toFixed(2) : '–'}</td>
-                            <td>${trade.sell_date ? new Date(trade.sell_date).toLocaleString() : '–'}</td>
-                            <td>
-                                <span class="status-badge ${trade.sell_price ? 'closed' : 'open'}">
+                    tbody.innerHTML = data.map(trade => {
+                        const invested = trade.total_quantity * trade.buy_price_avg;
+                        const currentValue = trade.sell_price ? 
+                            trade.total_quantity * trade.sell_price : 
+                            null;
+                        const pnl = currentValue ? currentValue - invested : null;
+                        const duration = trade.sell_date ? 
+                            Math.ceil((new Date(trade.sell_date) - new Date(trade.buy_date)) / 
+                            (1000 * 3600 * 24)) : 
+                            'Active';
+
+                        return `
+                        <tr data-status="${trade.sell_price ? 'closed' : 'open'}">
+                            <td class="ps-4 fw-bold">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="symbol-logo">${trade.symbol[0]}</div>
+                                    ${trade.symbol}
+                                </div>
+                            </td>
+                            <td>${trade.total_quantity} Shares</td>
+                            <td>₹${invested.toFixed(2)}</td>
+                            <td>${currentValue ? `₹${currentValue.toFixed(2)}` : '–'}</td>
+                            <td class="${pnl !== null ? (pnl >= 0 ? 'profit-positive' : 'profit-negative') : ''}">
+                                ${pnl !== null ? `${pnl >= 0 ? '+' : ''}₹${pnl.toFixed(2)}` : '–'}
+                            </td>
+                            <td>${duration}${typeof duration === 'number' ? 'd' : ''}</td>
+                            <td class="pe-4">
+                                <span class="status-badge ${trade.sell_price ? 'bg-success-soft' : 'bg-warning-soft'}">
+                                    <i class="mdi ${trade.sell_price ? 'mdi-check-circle' : 'mdi-progress-clock'}"></i>
                                     ${trade.sell_price ? 'Closed' : 'Open'}
                                 </span>
                             </td>
-                        </tr>
-                    `).join('');
-                })
-                .catch(error => {
-                    document.getElementById('trade-history-body').innerHTML = `
-                        <tr>
-                            <td colspan="8" class="text-center text-danger py-5">
-                                Error loading trade history
-                            </td>
-                        </tr>
-                    `;
+                        </tr>`;
+                    }).join('');
+
+                } catch (error) {
+                    console.error('Error loading data:', error);
+
+                    const tbody = document.getElementById('trade-history-body');
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Failed to load data: ${error.message}</td></tr>`;
+                }
+            }
+
+            function filterTable(status) {
+                document.querySelectorAll('#trade-history-body tr').forEach(row => {
+                    row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
                 });
+            }
+
+            loadData();
         });
     </script>
 </body>
