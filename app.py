@@ -58,21 +58,25 @@ def get_trade_history():
 def toggle_dont_sell():
     data = request.json
     symbol = data.get('symbol')
-    action = data.get('action')  # 'add' or 'remove'
+    action = data.get('action')
     
-    dont_sell = load_dont_sell_list()
+    config = load_dont_sell_config()
+    dont_sell = config['symbols']
     
     if action == 'add' and symbol not in dont_sell:
         dont_sell.append(symbol)
     elif action == 'remove' and symbol in dont_sell:
         dont_sell.remove(symbol)
         
-    save_dont_sell_list(dont_sell)
+    config['symbols'] = dont_sell
+    save_dont_sell_config(config)
     return jsonify({'status': 'success'})
 
 @app.route('/api/dont_sell')
 def get_dont_sell():
-    return jsonify({'symbols': load_dont_sell_list()})
+    config = load_dont_sell_config()
+    return jsonify(config)
+
 
 def process_positions():
     position_response_app = api.get_positions()
@@ -105,12 +109,14 @@ def process_positions():
 def index():
     fetch_stocks(stock_data, positions_symbols)
     positions, total_invested, total_unrealized = process_positions()
+    config = load_dont_sell_config()
     return render_template('index.html', 
                          stocks=stock_data,
                          purchased_stocks=purchased_stocks,
                          positions=positions,
                          total_invested=total_invested,
-                         total_unrealized=total_unrealized)
+                         total_unrealized=total_unrealized,
+                         config=config)
 
 @app.route('/api/positions')
 def get_positions():
@@ -273,6 +279,34 @@ def scheduled_sell_holding():
         sell_holding.sell_holding(api)
     else:
         print("Market is closed. sell_holding will not run.")
+
+@app.route('/api/sell_percentage', methods=['POST'])
+def update_sell_percentage():
+    data = request.json
+    percentage = float(data.get('percentage', 2.0))
+    
+    config = load_dont_sell_config()
+    config['sell_percentage'] = percentage
+    save_dont_sell_config(config)
+    return jsonify({'status': 'success', 'new_percentage': percentage})
+
+def load_dont_sell_config():
+    if not os.path.exists(DONT_SELL_FILE):
+        return {'symbols': [], 'sell_percentage': 2.0}
+    try:
+        with open(DONT_SELL_FILE, 'r') as f:
+            config = json.load(f)
+            # Handle legacy format
+            if isinstance(config, list):
+                return {'symbols': config, 'sell_percentage': 2.0}
+            return config
+    except json.JSONDecodeError:
+        return {'symbols': [], 'sell_percentage': 2.0}
+
+def save_dont_sell_config(config):
+    with open(DONT_SELL_FILE, 'w') as f:
+        json.dump(config, f)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5004, debug=False)

@@ -2,12 +2,17 @@
 from order_management import *
 from app import load_dont_sell_list
 from trade_history import update_trade_history_sell
+from app import load_dont_sell_config
+
 
 # Initialize a set to keep track of sold trading symbols
 sold_symbols = set()
 
 def sell_holding(api):
-    dont_sell_symbols = load_dont_sell_list()
+    config = load_dont_sell_config()
+    dont_sell_symbols = config['symbols']
+    sell_percentage = config.get('sell_percentage', 2.0)  # Default to 2% if missing
+    
     holdings_response = api.get_holdings()
     
     if holdings_response is None or not isinstance(holdings_response, list):
@@ -76,7 +81,7 @@ def sell_holding(api):
                     continue
                 
                 # Check if current price is greater than or equal to average buy price by 2%
-                if currentPrice >= averageBuyPrice * 1.02:  # 2% more than average buy price
+                if currentPrice >= averageBuyPrice * (1 + sell_percentage/100):
                     try:
                         order_response = placeOrder(api, buy_or_sell='S', 
                                                   tradingsymbol=tradingsymbol, 
