@@ -584,7 +584,7 @@
             </div>
 
             <div class="investment-controls">
-                <input type="number" id="investment-amount" min="1000" step="500" placeholder="Enter amount per stock"
+                <input type="number" id="investment-amount" min="500" step="500" placeholder="Enter amount per stock"
                     value="5000">
                 <button id="update-amount" class="btn">
                     <i class="fas fa-sync me-2"></i>
@@ -1022,7 +1022,7 @@
                 updatepositionsDisplay();
                 updateHoldingsDisplay();
 
-                //setInterval(updateCashDisplay, 5000);
+                setInterval(updateCashDisplay, 5000);
                 setInterval(updatepositionsDisplay, 5000);
                 setInterval(fetchStocks, 600000);
                 setInterval(updateHoldingsDisplay, 30000);
