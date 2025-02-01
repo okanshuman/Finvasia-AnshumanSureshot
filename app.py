@@ -261,7 +261,7 @@ def should_run_sell_holding():
     """Check if current time is within market hours."""
     now = datetime.now()
     # Market is open on weekdays and between 9:15 AM and 3:30 PM IST
-    if now.weekday() < 6:  # Monday to Friday
+    if now.weekday() < 5:  # Monday to Friday
         market_open_time = time(9, 15)  # 9:15 AM
         market_close_time = time(15, 30)  # 3:30 PM
         return market_open_time <= now.time() <= market_close_time
