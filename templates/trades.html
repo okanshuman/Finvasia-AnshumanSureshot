@@ -92,18 +92,20 @@
         }
 
         th.asc::after {
-        content: '↑';  /* Changed from '?' */
-        margin-left: 0.5em;
-        position: absolute;
-        right: 10px;
-    }
+            content: '↑';
+            /* Changed from '?' */
+            margin-left: 0.5em;
+            position: absolute;
+            right: 10px;
+        }
 
-    th.desc::after {
-        content: '↓';  /* Changed from '?' */
-        margin-left: 0.5em;
-        position: absolute;
-        right: 10px;
-    }
+        th.desc::after {
+            content: '↓';
+            /* Changed from '?' */
+            margin-left: 0.5em;
+            position: absolute;
+            right: 10px;
+        }
     </style>
 </head>
 
@@ -126,9 +128,16 @@
         <div class="row g-4 mb-4">
             <div class="col-12 col-md-6 col-xl-3">
                 <div class="stat-card">
-                    <div class="text-secondary mb-1">Total Investment</div>
-                    <div class="h3 mb-0" id="total-investment">-</div>
-                    <div class="text-muted small mt-1">Across all positions</div>
+                    <div class="text-secondary mb-1">Active Investment</div>
+                    <div class="h3 mb-0" id="active-investment">-</div>
+                    <div class="text-muted small mt-1">Open positions</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="text-secondary mb-1">Closed Investment</div>
+                    <div class="h3 mb-0" id="closed-investment">-</div>
+                    <div class="text-muted small mt-1">Closed positions</div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xl-3">
@@ -154,7 +163,7 @@
             </div>
             <div class="col-12 col-md-6 col-xl-2">
                 <div class="stat-card">
-                    <div class="text-secondary mb-1">ROI</div>
+                    <div class="text-secondary mb-1">ROI (Closed)</div>
                     <div class="h3 mb-0" id="roi">-</div>
                     <div class="text-muted small mt-1">Return on Investment</div>
                 </div>
@@ -199,15 +208,15 @@
             });
             document.querySelectorAll('th').forEach(th => {
                 th.style.cursor = 'pointer';
-                th.addEventListener('click', function() {
+                th.addEventListener('click', function () {
                     const columnIndex = this.cellIndex;
                     const isAscending = !this.classList.contains('asc');
-                    
+
                     document.querySelectorAll('th').forEach(h => {
                         h.classList.remove('asc', 'desc');
                     });
                     this.classList.add(isAscending ? 'asc' : 'desc');
-                    
+
                     sortTable(columnIndex, isAscending);
                 });
             });
@@ -220,23 +229,26 @@
                     window.tradeData = data; // Store data globally
 
                     // Calculate metrics
+
                     const closedTrades = data.filter(t => t.sell_price);
+                    const activeTrades = data.filter(t => !t.sell_price);
+
+                    const activeInvestment = activeTrades.reduce((acc, trade) =>
+                        acc + (trade.total_quantity * trade.buy_price_avg), 0);
+                    const closedInvestment = closedTrades.reduce((acc, trade) =>
+                        acc + (trade.total_quantity * trade.buy_price_avg), 0);
+
                     const transactionCharges = closedTrades.length * 12;
                     const realizedPNL = closedTrades.reduce((acc, trade) =>
                         acc + ((trade.sell_price - trade.buy_price_avg) * trade.total_quantity), 0);
                     const netProfit = realizedPNL - transactionCharges;
-
                     const totalInvestment = data.reduce((acc, trade) =>
                         acc + (trade.total_quantity * trade.buy_price_avg), 0);
-
-                    // Calculate Win Rate
                     const winningTrades = closedTrades.filter(trade =>
                         (trade.sell_price - trade.buy_price_avg) * trade.total_quantity > 0
                     ).length;
                     const winRate = closedTrades.length > 0 ? (winningTrades / closedTrades.length) * 100 : 0;
-
-                    // Calculate ROI
-                    const roi = totalInvestment !== 0 ? (netProfit / totalInvestment) * 100 : 0;
+                    const roi = closedInvestment !== 0 ? (netProfit / closedInvestment) * 100 : 0;
 
                     // Update DOM
                     document.getElementById('win-rate').innerHTML =
@@ -244,12 +256,11 @@
         ${winRate.toFixed(1)}%
     </span>`;
 
+                    document.getElementById('active-investment').textContent = `₹${activeInvestment.toFixed(2)}`;
+                    document.getElementById('closed-investment').textContent = `₹${closedInvestment.toFixed(2)}`;
                     document.getElementById('roi').innerHTML =
-                        `<span class="${roi >= 0 ? 'profit-positive' : 'profit-negative'}">
-        ${roi.toFixed(1)}%
-    </span>`;
+                        `<span class="${roi >= 0 ? 'profit-positive' : 'profit-negative'}">${roi.toFixed(1)}%</span>`;
 
-                    document.getElementById('total-investment').textContent = `₹${totalInvestment.toFixed(2)}`;
                     document.getElementById('realized-pnl').innerHTML =
                         `<span class="${realizedPNL >= 0 ? 'profit-positive' : 'profit-negative'}">
                             ₹${realizedPNL.toFixed(2)}
@@ -310,16 +321,16 @@
                 }
             }
             function renderTable(data) {
-    const tbody = document.getElementById('trade-history-body');
-    tbody.innerHTML = data.map(trade => {
-        const invested = trade.total_quantity * trade.buy_price_avg;
-        const currentValue = trade.sell_price ? trade.total_quantity * trade.sell_price : null;
-        const pnl = currentValue ? currentValue - invested : null;
-        const duration = trade.sell_date 
-            ? Math.ceil((new Date(trade.sell_date) - new Date(trade.buy_date)) / 86400000) 
-            : 'Active';
+                const tbody = document.getElementById('trade-history-body');
+                tbody.innerHTML = data.map(trade => {
+                    const invested = trade.total_quantity * trade.buy_price_avg;
+                    const currentValue = trade.sell_price ? trade.total_quantity * trade.sell_price : null;
+                    const pnl = currentValue ? currentValue - invested : null;
+                    const duration = trade.sell_date
+                        ? Math.ceil((new Date(trade.sell_date) - new Date(trade.buy_date)) / 86400000)
+                        : 'Active';
 
-        return `
+                    return `
         <tr data-status="${trade.sell_price ? 'closed' : 'open'}">
             <td class="ps-4 fw-bold">
                 <div class="d-flex align-items-center gap-2">
@@ -341,8 +352,8 @@
                 </span>
             </td>
         </tr>`;
-    }).join('');
-}
+                }).join('');
+            }
 
             function sortTable(columnIndex, ascending) {
                 const sortedData = window.tradeData.slice().sort((a, b) => {
@@ -351,8 +362,8 @@
 
                     switch (columnIndex) {
                         case 0: // Symbol
-                            return ascending ? 
-                                a.symbol.localeCompare(b.symbol) : 
+                            return ascending ?
+                                a.symbol.localeCompare(b.symbol) :
                                 b.symbol.localeCompare(a.symbol);
                         case 1: // Position Size
                             valueA = a.total_quantity;
@@ -371,9 +382,9 @@
                             if (valueB === null) return ascending ? -1 : 1;
                             break;
                         case 4: // P&L
-                            valueA = a.sell_price ? 
+                            valueA = a.sell_price ?
                                 (a.sell_price - a.buy_price_avg) * a.total_quantity : null;
-                            valueB = b.sell_price ? 
+                            valueB = b.sell_price ?
                                 (b.sell_price - b.buy_price_avg) * b.total_quantity : null;
                             // Handle nulls
                             if (valueA === null && valueB === null) return 0;
@@ -381,15 +392,15 @@
                             if (valueB === null) return ascending ? -1 : 1;
                             break;
                         case 5: // Duration
-                            valueA = a.sell_date ? 
-                                Math.ceil((new Date(a.sell_date) - new Date(a.buy_date)) / 86400000) : 
+                            valueA = a.sell_date ?
+                                Math.ceil((new Date(a.sell_date) - new Date(a.buy_date)) / 86400000) :
                                 Infinity;
-                            valueB = b.sell_date ? 
-                                Math.ceil((new Date(b.sell_date) - new Date(b.buy_date)) / 86400000) : 
+                            valueB = b.sell_date ?
+                                Math.ceil((new Date(b.sell_date) - new Date(b.buy_date)) / 86400000) :
                                 Infinity;
                             break;
                         case 6: // Status
-                            return ascending ? 
+                            return ascending ?
                                 (a.sell_price ? 1 : -1) - (b.sell_price ? 1 : -1) :
                                 (b.sell_price ? 1 : -1) - (a.sell_price ? 1 : -1);
                         default: return 0;
