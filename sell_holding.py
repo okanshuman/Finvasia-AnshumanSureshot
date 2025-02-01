@@ -83,9 +83,7 @@ def sell_holding(api):
                 # Check if current price is greater than or equal to average buy price by 2%
                 if currentPrice >= averageBuyPrice * (1 + sell_percentage/100):
                     try:
-                        order_response = placeOrder(api, buy_or_sell='S', 
-                                                  tradingsymbol=tradingsymbol, 
-                                                  quantity=quantity)
+                        order_response = placeOrder(api, buy_or_sell='S',tradingsymbol=tradingsymbol,quantity=quantity)
                         print(f"Placed sell order for {quantity} of {tradingsymbol}: {order_response}")
                         
                         # Add the symbol to the sold symbols set only if order was successful

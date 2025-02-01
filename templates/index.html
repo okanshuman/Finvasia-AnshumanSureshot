@@ -593,14 +593,6 @@
                 <button id="refresh-stocks" class="btn" title="Refresh stocks">
                     <i class="fas fa-sync"></i>
                 </button>
-
-                <div class="input-group" style="max-width: 200px;">
-                    <input type="number" id="sell-percentage" min="0.1" step="0.1" class="form-control"
-                        placeholder="Sell %" value="{{ config.get('sell_percentage', 2.0) }}">
-                    <button id="update-sell-percent" class="btn btn-primary">
-                        <i class="fas fa-percentage"></i>
-                    </button>
-                </div>
             </div>
 
             <div class="stock-table">
@@ -652,10 +644,24 @@
         </div>
 
         <div class="holdings-table mb-5">
-            <h2 class="fw-bold mb-3 text-primary">
-                <i class="fas fa-boxes me-2 header-icon"></i>
-                Current Holdings
-            </h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="fw-bold text-primary m-0">
+                    <i class="fas fa-boxes me-2 header-icon"></i>
+                    Current Holdings
+                </h2>
+                <div class="d-flex align-items-center mb-2" style="gap: 8px; max-width: 270px; flex-wrap: nowrap;">
+                    <label for="sell-percentage" class="form-label mb-0" style="white-space: nowrap;">Set Sell %</label>
+                    <div class="input-group" style="max-width: 160px;">
+                        <input type="number" id="sell-percentage" min="0.1" step="0.1" 
+                               class="form-control text-center" placeholder="%" 
+                               value="{{ config.get('sell_percentage', 2.0) }}" style="width: 90px;">
+                        <button id="update-sell-percent" class="btn btn-primary">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>      
+            </div>
+
             <div class="stock-table">
                 <table class="table table-hover align-middle">
                     <thead>

@@ -77,7 +77,6 @@ def get_dont_sell():
     config = load_dont_sell_config()
     return jsonify(config)
 
-
 def process_positions():
     position_response_app = api.get_positions()
     positions = []
@@ -306,7 +305,6 @@ def load_dont_sell_config():
 def save_dont_sell_config(config):
     with open(DONT_SELL_FILE, 'w') as f:
         json.dump(config, f)
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5004, debug=False)
