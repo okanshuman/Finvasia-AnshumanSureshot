@@ -180,7 +180,8 @@
                         <thead class="bg-primary-50">
                             <tr>
                                 <th class="ps-4">Symbol</th>
-                                <th>Position Size</th>
+                                <th>Average Price</th>
+                                <th>Quantity</th>
                                 <th>Invested</th>
                                 <th>Returned</th>
                                 <th>P&L</th>
@@ -334,87 +335,87 @@
                         : 'Active';
 
                     return `
-        <tr data-status="${trade.sell_price ? 'closed' : 'open'}">
-            <td class="ps-4 fw-bold">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="symbol-logo">${trade.symbol[0]}</div>
-                    ${trade.symbol}
-                </div>
-            </td>
-            <td>${trade.total_quantity} Shares</td>
-            <td>₹${invested.toFixed(2)}</td>
-            <td>${currentValue ? `₹${currentValue.toFixed(2)}` : '–'}</td>
-            <td class="${pnl !== null ? (pnl >= 0 ? 'profit-positive' : 'profit-negative') : ''}">
-                ${pnl !== null ? `${pnl >= 0 ? '+' : ''}₹${pnl.toFixed(2)}` : '–'}
-            </td>
-            <td>${duration}${typeof duration === 'number' ? 'd' : ''}</td>
-            <td class="pe-4">
-                <span class="status-badge ${trade.sell_price ? 'bg-success-soft' : 'bg-warning-soft'}">
-                    <i class="mdi ${trade.sell_price ? 'mdi-check-circle' : 'mdi-progress-clock'}"></i>
-                    ${trade.sell_price ? 'Closed' : 'Open'}
-                </span>
-            </td>
-        </tr>`;
+                    <tr data-status="${trade.sell_price ? 'closed' : 'open'}">
+                        <td class="ps-4 fw-bold">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="symbol-logo">${trade.symbol[0]}</div>
+                                ${trade.symbol}
+                            </div>
+                        </td>
+                        <td>₹${trade.buy_price_avg.toFixed(2)}</td> <!-- New Column Data -->
+                        <td>${trade.total_quantity}</td>
+                        <td>₹${invested.toFixed(2)}</td>
+                        <td>${currentValue ? `₹${currentValue.toFixed(2)}` : '–'}</td>
+                        <td class="${pnl !== null ? (pnl >= 0 ? 'profit-positive' : 'profit-negative') : ''}">
+                            ${pnl !== null ? `${pnl >= 0 ? '+' : ''}₹${pnl.toFixed(2)}` : '–'}
+                        </td>
+                        <td>${duration}${typeof duration === 'number' ? 'd' : ''}</td>
+                        <td class="pe-4">
+                            <span class="status-badge ${trade.sell_price ? 'bg-success-soft' : 'bg-warning-soft'}">
+                                <i class="mdi ${trade.sell_price ? 'mdi-check-circle' : 'mdi-progress-clock'}"></i>
+                                ${trade.sell_price ? 'Closed' : 'Open'}
+                            </span>
+                        </td>
+                    </tr>`;
                 }).join('');
             }
 
             function sortTable(columnIndex, ascending) {
                 const sortedData = window.tradeData.slice().sort((a, b) => {
-                    // Sorting logic for each column
                     let valueA, valueB;
 
                     switch (columnIndex) {
                         case 0: // Symbol
-                            return ascending ?
-                                a.symbol.localeCompare(b.symbol) :
+                            return ascending ? 
+                                a.symbol.localeCompare(b.symbol) : 
                                 b.symbol.localeCompare(a.symbol);
-                        case 1: // Position Size
+                        case 1: // Average Price (New sorting case)
+                            valueA = a.buy_price_avg;
+                            valueB = b.buy_price_avg;
+                            break;
+                        case 2: // Position Size (previously 1)
                             valueA = a.total_quantity;
                             valueB = b.total_quantity;
                             break;
-                        case 2: // Invested
+                        case 3: // Invested (previously 2)
                             valueA = a.total_quantity * a.buy_price_avg;
                             valueB = b.total_quantity * b.buy_price_avg;
                             break;
-                        case 3: // Current Value
+                        case 4: // Returned (previously 3)
                             valueA = a.sell_price ? a.total_quantity * a.sell_price : null;
                             valueB = b.sell_price ? b.total_quantity * b.sell_price : null;
-                            // Handle nulls
                             if (valueA === null && valueB === null) return 0;
                             if (valueA === null) return ascending ? 1 : -1;
                             if (valueB === null) return ascending ? -1 : 1;
                             break;
-                        case 4: // P&L
-                            valueA = a.sell_price ?
+                        case 5: // P&L (previously 4)
+                            valueA = a.sell_price ? 
                                 (a.sell_price - a.buy_price_avg) * a.total_quantity : null;
-                            valueB = b.sell_price ?
+                            valueB = b.sell_price ? 
                                 (b.sell_price - b.buy_price_avg) * b.total_quantity : null;
-                            // Handle nulls
                             if (valueA === null && valueB === null) return 0;
                             if (valueA === null) return ascending ? 1 : -1;
                             if (valueB === null) return ascending ? -1 : 1;
                             break;
-                        case 5: // Duration
-                            valueA = a.sell_date ?
-                                Math.ceil((new Date(a.sell_date) - new Date(a.buy_date)) / 86400000) :
+                        case 6: // Duration (previously 5)
+                            valueA = a.sell_date ? 
+                                Math.ceil((new Date(a.sell_date) - new Date(a.buy_date)) / 86400000) : 
                                 Infinity;
-                            valueB = b.sell_date ?
-                                Math.ceil((new Date(b.sell_date) - new Date(b.buy_date)) / 86400000) :
+                            valueB = b.sell_date ? 
+                                Math.ceil((new Date(b.sell_date) - new Date(b.buy_date)) / 86400000) : 
                                 Infinity;
                             break;
-                        case 6: // Status
-                            return ascending ?
-                                (a.sell_price ? 1 : -1) - (b.sell_price ? 1 : -1) :
+                        case 7: // Status (previously 6)
+                            return ascending ? 
+                                (a.sell_price ? 1 : -1) - (b.sell_price ? 1 : -1) : 
                                 (b.sell_price ? 1 : -1) - (a.sell_price ? 1 : -1);
                         default: return 0;
                     }
 
-                    // Numeric comparison
                     return ascending ? valueA - valueB : valueB - valueA;
                 });
 
                 renderTable(sortedData);
-                // Apply current filter
                 const activeStatus = document.querySelector('.filter-btn.active').dataset.status;
                 filterTable(activeStatus);
             }
