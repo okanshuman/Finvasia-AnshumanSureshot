@@ -10,6 +10,8 @@ from datetime import datetime, time
 import json
 import os
 from trade_history import update_trade_history_buy, load_trade_history
+from utils import ensure_eq_suffix
+
 
 app = Flask(__name__)
 
@@ -168,6 +170,7 @@ def buy_stocks():
 
         for stock in stocks_to_buy:
             trading_symbol_name = stock['symbol']
+            trading_symbol_name = ensure_eq_suffix(trading_symbol_name)
             correct_symbol_name = getSymbolNameFinvasia(api, trading_symbol_name)
 
             if quantity:
@@ -222,6 +225,7 @@ def get_holdings():
                         break
                 
                 if tradingsymbol:
+                    tradingsymbol = ensure_eq_suffix(tradingsymbol)
                     stock_name = getSymbolNameFinvasia(api, tradingsymbol)
                     qty = int(holding.get('holdqty', 0))
                     used_qty = int(holding.get('usedqty', 0))

@@ -1,6 +1,4 @@
-
 # fetch_and_buy_stock.py
-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options
@@ -10,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import logging
 from datetime import datetime
 import pytz  # Import pytz for timezone handling
-from utils import round_to_two_decimal, is_valid_symbol, clean_symbol
+from utils import *
 
 def fetch_stocks(stock_data, holdings):
     urls = [
@@ -41,7 +39,8 @@ def fetch_stocks(stock_data, holdings):
                 columns = row.find_elements(By.TAG_NAME, 'td')
                 if len(columns) > 5:  # Ensure there are enough columns to avoid index errors
                     stock_name = columns[1].text.strip()
-                    stock_symbol = clean_symbol(columns[2].text.strip().replace('$', '').replace('-EQ', ''))  # Remove -EQ
+                    stock_symbol = clean_symbol(columns[2].text.strip().replace('$', ''))
+                    stock_symbol = ensure_eq_suffix(stock_symbol) 
                     current_price = round_to_two_decimal(float(columns[5].text.strip()))  # Fetch current price
                     identified_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 

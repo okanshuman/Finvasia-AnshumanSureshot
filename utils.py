@@ -10,11 +10,19 @@ def is_valid_symbol(symbol):
         char.isdigit() for char in symbol)
 
 def clean_symbol(symbol):
-    """Remove 'NSE:' prefix and '-EQ' suffix from the symbol."""
-    return symbol.replace("NSE:", "").replace("-EQ", "")
+    """Remove 'NSE:' prefix from the symbol."""
+    return symbol.replace("NSE:", "")
 
 def calculate_percentage_change(cost_price, ltp):
     """Calculate the percentage change based on cost price and last traded price."""
     if cost_price == 0:
         return 0.0  # Avoid division by zero
     return round_to_two_decimal(((ltp - cost_price) / cost_price) * 100)
+
+def ensure_eq_suffix(symbol):
+    """
+    Ensure the stock symbol ends with '-EQ'. If not, append '-EQ'.
+    """
+    if not symbol.endswith("-EQ"):
+        symbol += "-EQ"
+    return symbol
