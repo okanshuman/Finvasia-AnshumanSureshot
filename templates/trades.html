@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-   <style>
+    <style>
         :root {
             --primary: #6366f1;
             --primary-hover: #4f46e5;
@@ -108,6 +108,16 @@
             position: absolute;
             right: 10px;
         }
+
+        th:not(:first-child),
+        td:not(:first-child) {
+            text-align: center;
+        }
+
+        th:first-child,
+        td:first-child {
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -138,7 +148,7 @@
             </div>
             <div class="col-12 col-md-6 col-xl-3">
                 <div class="stat-card">
-                    <div class="text-secondary mb-1">Closed Investment</div>
+                    <div class="text-secondary mb-1">Till Date</div>
                     <div class="h3 mb-0" id="closed-investment">-</div>
                     <div class="text-muted small mt-1">Closed positions</div>
                 </div>
@@ -179,7 +189,7 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-primary-50">
                             <tr>
-                                <th class="ps-4">Symbol</th>
+                                <th class="ps-4">Stock Symbol</th>
                                 <th>Average Price</th>
                                 <th>Quantity</th>
                                 <th>Invested</th>
@@ -366,8 +376,8 @@
 
                     switch (columnIndex) {
                         case 0: // Symbol
-                            return ascending ? 
-                                a.symbol.localeCompare(b.symbol) : 
+                            return ascending ?
+                                a.symbol.localeCompare(b.symbol) :
                                 b.symbol.localeCompare(a.symbol);
                         case 1: // Average Price (New sorting case)
                             valueA = a.buy_price_avg;
@@ -389,25 +399,25 @@
                             if (valueB === null) return ascending ? -1 : 1;
                             break;
                         case 5: // P&L (previously 4)
-                            valueA = a.sell_price ? 
+                            valueA = a.sell_price ?
                                 (a.sell_price - a.buy_price_avg) * a.total_quantity : null;
-                            valueB = b.sell_price ? 
+                            valueB = b.sell_price ?
                                 (b.sell_price - b.buy_price_avg) * b.total_quantity : null;
                             if (valueA === null && valueB === null) return 0;
                             if (valueA === null) return ascending ? 1 : -1;
                             if (valueB === null) return ascending ? -1 : 1;
                             break;
                         case 6: // Duration (previously 5)
-                            valueA = a.sell_date ? 
-                                Math.ceil((new Date(a.sell_date) - new Date(a.buy_date)) / 86400000) : 
+                            valueA = a.sell_date ?
+                                Math.ceil((new Date(a.sell_date) - new Date(a.buy_date)) / 86400000) :
                                 Infinity;
-                            valueB = b.sell_date ? 
-                                Math.ceil((new Date(b.sell_date) - new Date(b.buy_date)) / 86400000) : 
+                            valueB = b.sell_date ?
+                                Math.ceil((new Date(b.sell_date) - new Date(b.buy_date)) / 86400000) :
                                 Infinity;
                             break;
                         case 7: // Status (previously 6)
-                            return ascending ? 
-                                (a.sell_price ? 1 : -1) - (b.sell_price ? 1 : -1) : 
+                            return ascending ?
+                                (a.sell_price ? 1 : -1) - (b.sell_price ? 1 : -1) :
                                 (b.sell_price ? 1 : -1) - (a.sell_price ? 1 : -1);
                         default: return 0;
                     }
