@@ -48,10 +48,6 @@ def save_dont_sell_list(symbols):
 def trades():
     return render_template('trades.html')
 
-@app.route('/trades')
-def trade_history_page():
-    return render_template('trades.html')
-
 @app.route('/api/trade_history')
 def get_trade_history():
     return jsonify(load_trade_history())
